@@ -26,6 +26,8 @@ No primeiro acesso, criamos a conta de administrador e cadastramos os dados do n
 
 Documentamos essas opções de hospedagem, mas ainda não publicamos a aplicação. Para executar localmente, não dependemos dos provedores.
 
+Para publicar a API, incluímos `render.yaml` com o plano gratuito: [configurar no Render](https://render.com/deploy?repo=https://github.com/gabriellyleitedev/plataforma-gestao-integrada). Preenchemos as credenciais do MySQL e a origem da Vercel no painel do serviço. Depois, configuramos `VITE_API_URL` na Vercel com a URL pública da API terminando em `/api` e fazemos um novo deploy.
+
 ## Funcionalidades disponíveis
 
 - Login, logout, troca de senha e gestão de usuários com perfis administrador, gestor e operador.

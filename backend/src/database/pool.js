@@ -8,6 +8,7 @@ export function getPool() {
     const missing = required.filter((key) => !process.env[key]);
     if (missing.length) throw new Error(`Configuração MySQL incompleta: ${missing.join(', ')}`);
     const ssl = process.env.DB_SSL === 'true';
+    const ca = process.env.DB_SSL_CA ? process.env.DB_SSL_CA.replaceAll('\\n', '\n') : process.env.DB_SSL_CA_PATH ? readFileSync(process.env.DB_SSL_CA_PATH, 'utf8') : undefined;
     pool = mysql.createPool({
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT || 3306),
@@ -19,7 +20,7 @@ export function getPool() {
       queueLimit: 20,
       connectTimeout: 10000,
       charset: 'utf8mb4',
-      ...(ssl ? { ssl: { rejectUnauthorized: true, ...(process.env.DB_SSL_CA_PATH ? { ca: readFileSync(process.env.DB_SSL_CA_PATH, 'utf8') } : {}) } } : {})
+      ...(ssl ? { ssl: { rejectUnauthorized: true, ...(ca ? { ca } : {}) } } : {})
     });
   }
   return pool;

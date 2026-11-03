@@ -1,6 +1,21 @@
 import { test, expect } from '@playwright/test';
 import { randomBytes } from 'node:crypto';
 
+test('mostramos falha de configuração sem afirmar conexão com o banco', async ({ page }) => {
+  await page.route('**/api/setup', (route) => route.fulfill({ status: 404, contentType: 'text/plain', body: 'Not found' }));
+  await page.goto('/entrar');
+  await expect(page.getByRole('alert')).toContainText('Precisamos configurar a URL da API');
+  await expect(page.getByText('Conexão com banco MySQL.', { exact: true })).toHaveCount(0);
+  await expect(page.getByLabel('E-mail', { exact: true })).toHaveCount(0);
+});
+
+test('recusamos resposta HTML no endereço da API sem interromper a tela', async ({ page }) => {
+  await page.route('**/api/setup', (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<html>Frontend</html>' }));
+  await page.goto('/entrar');
+  await expect(page.getByRole('alert')).toContainText('Precisamos verificar a URL da API');
+  await expect(page.getByText('Conexão com banco MySQL.', { exact: true })).toHaveCount(0);
+});
+
 test('cadastros, venda, dashboard e estoque pelo navegador', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));

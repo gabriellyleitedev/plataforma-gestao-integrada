@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: plataforma-gestao-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci --workspace backend --include-workspace-root=false --omit=dev
+    startCommand: npm start -w backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: '24'
+      - key: NODE_ENV
+        value: production
+      - key: DB_DRIVER
+        value: mysql
+      - key: FRONTEND_URL
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_SSL
+        value: 'true'
+      - key: DB_SSL_CA
+        sync: false
