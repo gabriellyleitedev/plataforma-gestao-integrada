@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+
+  mysql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Iniciar MySQL isolado com senha aleatória
+        shell: bash
+        run: |
+          database_password="$(openssl rand -hex 32)"
+          echo "::add-mask::$database_password"
+          echo "TEST_MYSQL_PASSWORD=$database_password" >> "$GITHUB_ENV"
+          docker run --name pgi-mysql --detach --publish 127.0.0.1:33307:3306 --env MYSQL_ROOT_HOST=% --env MYSQL_ROOT_PASSWORD="$database_password" mysql:8.4
+          for attempt in {1..60}; do
+            if docker exec pgi-mysql mysqladmin ping --silent >/dev/null 2>&1; then break; fi
+            sleep 2
+          done
+          docker exec pgi-mysql mysqladmin ping --silent
+      - name: Testar fluxos em MySQL real
+        run: npm run test:mysql
+        env:
+          TEST_MYSQL_HOST: 127.0.0.1
+          TEST_MYSQL_PORT: '33307'
+          TEST_MYSQL_USER: root
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env:
+          PLAYWRIGHT_CHANNEL: chromium

@@ -1,0 +1,21 @@
+name: plataforma-gestao-integrada
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${DB_PORT:-3306}:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-plataforma_gestao_integrada}
+      MYSQL_USER: ${DB_USER:-pgi}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD no arquivo database/.env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Configure MYSQL_ROOT_PASSWORD no arquivo database/.env}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+volumes:
+  mysql_data:
