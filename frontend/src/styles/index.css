@@ -1054,6 +1054,20 @@ tbody tr:hover {
   text-align: center;
   color: #99a7a7;
 }
+@media (max-height: 680px) {
+  .login-form > .eyebrow,
+  .login-form > p:not(.eyebrow),
+  .login-footnote {
+    display: none;
+  }
+  .login-form h2 {
+    font-size: 24px;
+    margin: 0 0 16px;
+  }
+  .login-form .field small {
+    display: none;
+  }
+}
 @media (min-width: 1600px) {
   .content {
     padding-top: 45px;
