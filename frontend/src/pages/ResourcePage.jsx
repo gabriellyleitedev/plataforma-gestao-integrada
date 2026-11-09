@@ -95,9 +95,9 @@ function ResourceForm({ resource, record, onClose, onSaved }) {
   const [options, setOptions] = useState(null);
   const [optionsError, setOptionsError] = useState('');
   const optionPath =
-    resource === 'items' ? '/categories' : resource === 'appointments' ? '/clients' : '/setup';
+    resource === 'items' ? '/categories' : resource === 'appointments' ? '/clients' : '/status';
   const lookup = useData(optionPath);
-  const suppliers = useData(resource === 'items' ? '/suppliers' : '/setup');
+  const suppliers = useData(resource === 'items' ? '/suppliers' : '/status');
   async function submit(event) {
     event.preventDefault();
     const values = Object.fromEntries(new FormData(event.currentTarget));

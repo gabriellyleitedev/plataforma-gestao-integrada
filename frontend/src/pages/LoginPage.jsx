@@ -7,24 +7,26 @@ import { Field, Message, Loading, Icon } from '../components/ui.jsx';
 
 export function LoginPage() {
   const { user, signIn } = useAuth();
-  const { data, error, loading, reload } = useData('/setup');
+  const { data, error, loading, reload } = useData('/status');
+  const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState('');
   if (user) return <Navigate to="/" replace />;
+  function switchMode() {
+    setCreating(!creating);
+    setFailure('');
+  }
   async function submit(event) {
     event.preventDefault();
     const values = Object.fromEntries(new FormData(event.currentTarget));
-    if (data.needsSetup && values.password !== values.confirmation) {
+    if (creating && values.password !== values.confirmation) {
       setFailure('As senhas precisam ser iguais.');
       return;
     }
     setBusy(true);
     setFailure('');
     try {
-      if (data.needsSetup) {
-        await api('/setup', { method: 'POST', body: values });
-        reload();
-      }
+      if (creating) await api('/auth/register', { method: 'POST', body: values });
       await signIn(values.email, values.password);
     } catch (error) {
       setFailure(error.message || 'Não foi possível conectar à API.');
@@ -73,17 +75,13 @@ export function LoginPage() {
         <div className="login-form">
           <p className="eyebrow">BEM-VINDO À INTEGRA</p>
           <h2>
-            {error
-              ? 'Precisamos conectar o sistema'
-              : data?.needsSetup
-                ? 'Vamos começar?'
-                : 'Acesse seu espaço'}
+            {error ? 'Precisamos conectar o sistema' : creating ? 'Crie sua conta' : 'Acesse seu espaço'}
           </h2>
           <p>
             {error
               ? 'Ainda não conseguimos acessar o serviço de autenticação.'
-              : data?.needsSetup
-                ? 'Crie o primeiro administrador do seu negócio.'
+              : creating
+                ? 'Cadastre seu negócio e comece a usar agora.'
                 : 'Entre com o e-mail e a senha cadastrados.'}
           </p>
           {loading ? (
@@ -96,26 +94,31 @@ export function LoginPage() {
               </button>
             </>
           ) : (
-            <form onSubmit={submit}>
-              {data.needsSetup && (
-                <Field label="Seu nome">
-                  <input name="name" required maxLength={160} autoComplete="name" />
-                </Field>
+            <form onSubmit={submit} key={creating ? 'register' : 'login'}>
+              {creating && (
+                <>
+                  <Field label="Seu nome">
+                    <input name="name" required maxLength={160} autoComplete="name" />
+                  </Field>
+                  <Field label="Nome do negócio">
+                    <input name="company" required maxLength={160} autoComplete="organization" />
+                  </Field>
+                </>
               )}
               <Field label="E-mail">
                 <input name="email" type="email" required maxLength={190} autoComplete="username" />
               </Field>
-              <Field label="Senha" hint={data.needsSetup ? 'Use entre 10 e 128 caracteres.' : undefined}>
+              <Field label="Senha" hint={creating ? 'Use entre 10 e 128 caracteres.' : undefined}>
                 <input
                   name="password"
                   type="password"
                   required
-                  minLength={data.needsSetup ? 10 : 1}
+                  minLength={creating ? 10 : 1}
                   maxLength={128}
-                  autoComplete={data.needsSetup ? 'new-password' : 'current-password'}
+                  autoComplete={creating ? 'new-password' : 'current-password'}
                 />
               </Field>
-              {data.needsSetup && (
+              {creating && (
                 <Field label="Confirme a senha">
                   <input
                     name="confirmation"
@@ -129,9 +132,15 @@ export function LoginPage() {
               )}
               <Message>{failure}</Message>
               <button className="button primary full" disabled={busy}>
-                {busy ? 'Aguarde…' : data.needsSetup ? 'Criar conta e começar' : 'Entrar'}
+                {busy ? 'Aguarde…' : creating ? 'Criar conta e começar' : 'Entrar'}
                 <Icon name="arrow" />
               </button>
+              <p className="login-switch">
+                {creating ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
+                <button type="button" className="text-button" onClick={switchMode}>
+                  {creating ? 'Entrar' : 'Criar conta'}
+                </button>
+              </p>
             </form>
           )}
           <div className="login-footnote">

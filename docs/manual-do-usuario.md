@@ -2,7 +2,7 @@
 
 ## Acesso
 
-No primeiro acesso, criamos o administrador com nome, e-mail e senha. Depois, entramos com essa conta e cadastramos os demais usuários. Para trocar nossa senha, clicamos no nome no topo, informamos a senha atual e confirmamos a nova. Após a troca, entramos novamente. Encerramos a sessão pelo botão de saída.
+Na tela de entrada, clicamos em **Criar conta** e informamos nome, nome do negócio, e-mail e senha. Viramos administradores desse negócio e cadastramos os demais usuários em **Usuários**. Nos próximos acessos, entramos com o mesmo e-mail e senha. Para trocar nossa senha, clicamos no nome no topo, informamos a senha atual e confirmamos a nova. Após a troca, entramos novamente. Encerramos a sessão pelo botão de saída.
 
 ## Cadastros
 

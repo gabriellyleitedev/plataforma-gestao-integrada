@@ -7,6 +7,7 @@ async function move(item, delta, type, reason, userId, saleId = null) {
     fail(409, `Estoque insuficiente ou limite excedido para ${item.name}. Saldo atual: ${item.stock}.`);
   await query('UPDATE items SET stock = ? WHERE id = ?', [balance, item.id]);
   await insert('stock_movements', {
+    company_id: item.company_id,
     item_id: item.id,
     user_id: userId,
     sale_id: saleId,
@@ -18,13 +19,16 @@ async function move(item, delta, type, reason, userId, saleId = null) {
   });
 }
 
-export async function stockMovement(data, userId) {
+export async function stockMovement(data, { userId, companyId }) {
   const id = identifier(data.item_id);
   const type = choice(data.type, ['entry', 'exit', 'adjustment'], 'Movimentação');
   const amount = integer(data.quantity, 'Quantidade', type === 'adjustment' ? 0 : 1, 1000000);
   const reason = text(data.reason, 'Motivo', { max: 500 });
   return transaction(async () => {
-    const item = await one(`SELECT * FROM items WHERE id = ? AND archived = 0${lock}`, [id]);
+    const item = await one(`SELECT * FROM items WHERE id = ? AND company_id = ? AND archived = 0${lock}`, [
+      id,
+      companyId
+    ]);
     if (!item || item.type !== 'product')
       fail(400, 'Selecione um produto ativo. Serviços não movimentam estoque.');
     const delta = type === 'adjustment' ? amount - item.stock : type === 'exit' ? -amount : amount;
@@ -34,15 +38,16 @@ export async function stockMovement(data, userId) {
   });
 }
 
-export async function listMovements() {
+export async function listMovements({ companyId }) {
   return (
     await query(
-      'SELECT m.*, i.name AS item_name, u.name AS user_name FROM stock_movements m JOIN items i ON i.id = m.item_id JOIN users u ON u.id = m.user_id ORDER BY m.id DESC'
+      'SELECT m.*, i.name AS item_name, u.name AS user_name FROM stock_movements m JOIN items i ON i.id = m.item_id JOIN users u ON u.id = m.user_id WHERE m.company_id = ? ORDER BY m.id DESC',
+      [companyId]
     )
   ).rows;
 }
 
-export async function createSale(data, userId) {
+export async function createSale(data, { userId, companyId }) {
   const clientId = optionalId(data.client_id);
   const payment = choice(data.payment_method, ['pix', 'cash', 'credit', 'debit', 'other'], 'Pagamento');
   const notes = text(data.notes, 'Observações', { required: false, max: 5000 });
@@ -56,11 +61,14 @@ export async function createSale(data, userId) {
     fail(400, 'Agrupe as quantidades de itens repetidos.');
   lines.sort((a, b) => a.item_id - b.item_id);
   return transaction(async () => {
-    await reference(one, 'clients', clientId, 'Cliente');
+    await reference(one, 'clients', clientId, 'Cliente', companyId);
     const prepared = [];
     let total = 0;
     for (const line of lines) {
-      const item = await one(`SELECT * FROM items WHERE id = ? AND archived = 0${lock}`, [line.item_id]);
+      const item = await one(`SELECT * FROM items WHERE id = ? AND company_id = ? AND archived = 0${lock}`, [
+        line.item_id,
+        companyId
+      ]);
       if (!item) fail(400, 'Um dos itens não está mais disponível.');
       if (item.type === 'product' && item.stock < line.quantity)
         fail(409, `Estoque insuficiente para ${item.name}. Disponível: ${item.stock}.`);
@@ -70,6 +78,7 @@ export async function createSale(data, userId) {
       prepared.push({ ...line, item });
     }
     const id = await insert('sales', {
+      company_id: companyId,
       client_id: clientId,
       user_id: userId,
       total_cents: total,
@@ -90,14 +99,14 @@ export async function createSale(data, userId) {
       });
       if (item.type === 'product') await move(item, -quantity, 'sale', `Venda #${id}`, userId, id);
     }
-    return saleDetail(id);
+    return saleDetail(id, { companyId });
   });
 }
 
-export async function saleDetail(id) {
+export async function saleDetail(id, { companyId }) {
   const sale = await one(
-    'SELECT s.*, c.name AS client_name, u.name AS user_name FROM sales s LEFT JOIN clients c ON c.id = s.client_id JOIN users u ON u.id = s.user_id WHERE s.id = ?',
-    [id]
+    'SELECT s.*, c.name AS client_name, u.name AS user_name FROM sales s LEFT JOIN clients c ON c.id = s.client_id JOIN users u ON u.id = s.user_id WHERE s.id = ? AND s.company_id = ?',
+    [id, companyId]
   );
   if (!sale) fail(404, 'Venda não encontrada.');
   return {
@@ -105,18 +114,19 @@ export async function saleDetail(id) {
     items: (await query('SELECT * FROM sale_items WHERE sale_id = ? ORDER BY id', [id])).rows
   };
 }
-export async function listSales() {
+export async function listSales({ companyId }) {
   return (
     await query(
-      'SELECT s.*, c.name AS client_name, u.name AS user_name FROM sales s LEFT JOIN clients c ON c.id = s.client_id JOIN users u ON u.id = s.user_id ORDER BY s.id DESC'
+      'SELECT s.*, c.name AS client_name, u.name AS user_name FROM sales s LEFT JOIN clients c ON c.id = s.client_id JOIN users u ON u.id = s.user_id WHERE s.company_id = ? ORDER BY s.id DESC',
+      [companyId]
     )
   ).rows;
 }
 
-export async function cancelSale(id, reason, userId) {
+export async function cancelSale(id, reason, { userId, companyId }) {
   reason = text(reason, 'Motivo do cancelamento', { max: 500 });
   return transaction(async () => {
-    const sale = await one(`SELECT * FROM sales WHERE id = ?${lock}`, [id]);
+    const sale = await one(`SELECT * FROM sales WHERE id = ? AND company_id = ?${lock}`, [id, companyId]);
     if (!sale) fail(404, 'Venda não encontrada.');
     if (sale.status !== 'completed') fail(409, 'Esta venda já foi cancelada.');
     const lines = (await query('SELECT * FROM sale_items WHERE sale_id = ? ORDER BY item_id', [id])).rows;
@@ -131,11 +141,11 @@ export async function cancelSale(id, reason, userId) {
       new Date().toISOString(),
       id
     ]);
-    return saleDetail(id);
+    return saleDetail(id, { companyId });
   });
 }
 
-export async function report(from, to) {
+export async function report(from, to, { companyId }) {
   const valid = (value) =>
     /^\d{4}-\d{2}-\d{2}$/.test(value) &&
     Number.isFinite(new Date(`${value}T00:00:00.000Z`).getTime()) &&
@@ -145,19 +155,22 @@ export async function report(from, to) {
   const end = `${to}T23:59:59.999Z`;
   const sales = (
     await query(
-      'SELECT s.*, c.name AS client_name FROM sales s LEFT JOIN clients c ON c.id = s.client_id WHERE s.created_at >= ? AND s.created_at <= ? ORDER BY s.created_at DESC',
-      [start, end]
+      'SELECT s.*, c.name AS client_name FROM sales s LEFT JOIN clients c ON c.id = s.client_id WHERE s.company_id = ? AND s.created_at >= ? AND s.created_at <= ? ORDER BY s.created_at DESC',
+      [companyId, start, end]
     )
   ).rows;
   const completed = sales.filter((sale) => sale.status === 'completed');
   const lines = (
     await query(
-      "SELECT si.*, s.created_at FROM sale_items si JOIN sales s ON s.id = si.sale_id WHERE s.status = 'completed' AND s.created_at >= ? AND s.created_at <= ?",
-      [start, end]
+      "SELECT si.*, s.created_at FROM sale_items si JOIN sales s ON s.id = si.sale_id WHERE s.company_id = ? AND s.status = 'completed' AND s.created_at >= ? AND s.created_at <= ?",
+      [companyId, start, end]
     )
   ).rows;
   const products = (
-    await query("SELECT * FROM items WHERE type = 'product' AND archived = 0 ORDER BY stock, name")
+    await query(
+      "SELECT * FROM items WHERE company_id = ? AND type = 'product' AND archived = 0 ORDER BY stock, name",
+      [companyId]
+    )
   ).rows;
   const days = new Map();
   const top = new Map();
@@ -180,7 +193,10 @@ export async function report(from, to) {
     cancelled_count: sales.length - completed.length,
     average_cents: completed.length ? Math.round(revenue / completed.length) : 0,
     margin_cents: lines.reduce((sum, line) => sum + (line.price_cents - line.cost_cents) * line.quantity, 0),
-    clients_count: Number((await one('SELECT COUNT(*) AS total FROM clients WHERE archived = 0')).total),
+    clients_count: Number(
+      (await one('SELECT COUNT(*) AS total FROM clients WHERE company_id = ? AND archived = 0', [companyId]))
+        .total
+    ),
     stock_value_cents: products.reduce((sum, item) => sum + item.stock * item.cost_cents, 0),
     low_stock: products.filter((item) => item.stock <= item.stock_minimum),
     series: [...days]

@@ -8,7 +8,7 @@ Nosso objetivo é reunir as rotinas administrativas de pequenos negócios em uma
 
 Atendemos comércios e prestadores de serviços. Separamos produtos de serviços para controlar o estoque apenas dos produtos. Detalhamos as funcionalidades no [escopo](docs/escopo.md).
 
-No primeiro acesso, criamos a conta de administrador. Não usamos contas ou senhas padrão.
+Cada pessoa cria a própria conta na tela de entrada, informando nome, nome do negócio, e-mail e senha. O cadastro cria um espaço exclusivo para o negócio, com a pessoa como administradora. Os dados de cada negócio ficam isolados dos demais. Não usamos contas ou senhas padrão.
 
 ## Tecnologias
 
@@ -33,23 +33,18 @@ No plano gratuito do Render, a API entra em repouso após 15 minutos sem uso, e 
 
 Para publicar a API, incluímos `render.yaml` com o plano gratuito: [configurar no Render](https://render.com/deploy?repo=https://github.com/gabriellyleitedev/plataforma-gestao-integrada). Preenchemos as credenciais do MySQL e a origem da Vercel no painel do serviço. Depois, configuramos `VITE_API_URL` na Vercel com a URL pública da API terminando em `/api` e fazemos um novo deploy.
 
-## Acesso para avaliação
+## Como testar
 
-Disponibilizamos uma conta de demonstração no ambiente publicado para professores e convidados testarem o sistema.
+1. Acessamos https://plataforma-gestao-integrada.vercel.app.
+2. Clicamos em **Criar conta** e informamos nome, nome do negócio, e-mail e senha de pelo menos 10 caracteres.
+3. Entramos automaticamente no painel. Nos próximos acessos, usamos o mesmo e-mail e senha.
+4. Para ver os indicadores em funcionamento, cadastramos um produto, registramos uma entrada no estoque e fazemos uma venda.
 
-| Campo | Valor |
-| --- | --- |
-| Endereço | https://plataforma-gestao-integrada.vercel.app |
-| E-mail | `demo@integra.com` |
-| Senha | `integra2026` |
-| Perfil | Gestor |
-
-Com essa conta, é possível cadastrar, editar e arquivar clientes, atendimentos, produtos, serviços, categorias e fornecedores, movimentar o estoque, registrar e cancelar vendas, consultar o dashboard e exportar relatórios. Apenas a gestão de usuários fica restrita aos administradores da equipe.
-
-Todos os visitantes compartilham os mesmos dados de demonstração. Se o primeiro acesso demorar, aguardamos até um minuto enquanto a API gratuita sai do repouso.
+Cada conta é administradora do próprio negócio e pode convidar outros usuários em **Usuários**. Se o primeiro acesso demorar, aguardamos até um minuto enquanto a API gratuita sai do repouso.
 
 ## Funcionalidades disponíveis
 
+- Cadastro aberto com espaço próprio para cada negócio e isolamento dos dados entre negócios.
 - Login, logout, troca de senha e gestão de usuários com perfis administrador, gestor e operador.
 - Cadastro, consulta, busca, edição e arquivamento de clientes, categorias, fornecedores, produtos, serviços e atendimentos.
 - Entradas, saídas e ajustes de estoque, com motivo, responsável e histórico.
@@ -58,7 +53,7 @@ Todos os visitantes compartilham os mesmos dados de demonstração. Se o primeir
 - Dashboard com faturamento, vendas concluídas, ticket médio, clientes, gráfico diário, destaques e alerta de estoque.
 - Relatórios por período, margem bruta estimada, valor atual de estoque e exportação CSV das vendas.
 
-Trabalhamos com uma empresa por instalação, quantidades inteiras e valores monetários em centavos. Bloqueamos operações com estoque negativo.
+Trabalhamos com vários negócios na mesma instalação, quantidades inteiras e valores monetários em centavos. Bloqueamos operações com estoque negativo.
 
 ## Início rápido
 

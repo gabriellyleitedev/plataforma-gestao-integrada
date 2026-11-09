@@ -46,4 +46,4 @@ Usamos SQLite no desenvolvimento e validamos os mesmos fluxos em MySQL. Para con
 
 Publicamos a interface na Vercel, a API no Render e o banco no TiDB Cloud Starter, todos em planos gratuitos. Mantemos os endereços e as instruções em `docs/hospedagem.md`.
 
-Para gerar o modelo `.mwb`, importamos o SQL no Workbench e revisamos os relacionamentos. Não incluímos múltiplas empresas no mesmo banco, emissão fiscal, processamento de pagamentos ou recuperação de senha por e-mail.
+Para gerar o modelo `.mwb`, importamos o SQL no Workbench e revisamos os relacionamentos. Não incluímos emissão fiscal, processamento de pagamentos ou recuperação de senha por e-mail.

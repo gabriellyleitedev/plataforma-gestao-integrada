@@ -62,6 +62,6 @@ Em banco já provisionado, inicializamos as tabelas do schema com o usuário aut
 3. Conferimos HTTPS, CORS, conexão com o banco e acesso direto às rotas.
 4. Revisamos cotas e evitamos habilitar planos pagos ou upgrades automáticos.
 
-Se encontrarmos HTTP 404 em `/api/setup` na Vercel, conferimos se publicamos a API e configuramos `VITE_API_URL` com sua URL HTTPS terminando em `/api`. Depois de alterar a variável, fazemos um novo deploy para incorporar o valor no frontend.
+Se encontrarmos HTTP 404 em `/api/status` na Vercel, conferimos se publicamos a API e configuramos `VITE_API_URL` com sua URL HTTPS terminando em `/api`. Depois de alterar a variável, fazemos um novo deploy para incorporar o valor no frontend.
 
 Se não conseguirmos um plano gratuito compatível, mantemos a apresentação local até definirmos outra opção.

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
-  setupStatus,
-  setup,
+  status,
+  register,
   login,
   authenticate,
   permit,
@@ -32,8 +32,10 @@ managementRoutes.use((req, _res, next) => {
   }
   next();
 });
-managementRoutes.get('/setup', async (_req, res) => res.json(await setupStatus()));
-managementRoutes.post('/setup', async (req, res) => res.status(201).json(await setup(req.body)));
+const scope = (req) => ({ userId: req.user.id, companyId: req.companyId });
+
+managementRoutes.get('/status', async (_req, res) => res.json(await status()));
+managementRoutes.post('/auth/register', async (req, res) => res.status(201).json(await register(req.body)));
 managementRoutes.post('/auth/login', async (req, res) => res.json(await login(req.body, req.ip)));
 managementRoutes.use((req, res, next) => {
   if (
@@ -60,11 +62,17 @@ managementRoutes.put('/auth/password', async (req, res) => {
   });
   res.json({ message: 'Senha atualizada. Entre novamente.' });
 });
-managementRoutes.get('/users', permit('admin'), async (_req, res) =>
-  res.json((await query('SELECT id, name, email, role, active FROM users ORDER BY id')).rows.map(publicUser))
+managementRoutes.get('/users', permit('admin'), async (req, res) =>
+  res.json(
+    (
+      await query('SELECT id, name, email, role, active FROM users WHERE company_id = ? ORDER BY id', [
+        req.companyId
+      ])
+    ).rows.map(publicUser)
+  )
 );
 managementRoutes.post('/users', permit('admin'), async (req, res) =>
-  res.status(201).json(await transaction(() => createUser(req.body)))
+  res.status(201).json(await transaction(() => createUser(req.body, req.companyId)))
 );
 managementRoutes.put('/users/:id', permit('admin'), async (req, res) => {
   const id = identifier(req.params.id);
@@ -78,7 +86,8 @@ managementRoutes.put('/users/:id', permit('admin'), async (req, res) => {
   if (id === req.user.id && (!fields.active || fields.role !== 'admin'))
     fail(400, 'Você não pode desativar ou remover seu próprio perfil de administrador.');
   const result = await transaction(async () => {
-    if (!(await one(`SELECT id FROM users WHERE id = ?${lock}`, [id]))) fail(404, 'Usuário não encontrado.');
+    if (!(await one(`SELECT id FROM users WHERE id = ? AND company_id = ?${lock}`, [id, req.companyId])))
+      fail(404, 'Usuário não encontrado.');
     if (await one('SELECT id FROM users WHERE email = ? AND id <> ?', [fields.email, id]))
       fail(409, 'E-mail já cadastrado.');
     await query('UPDATE users SET name = ?, email = ?, role = ?, active = ? WHERE id = ?', [
@@ -100,29 +109,33 @@ for (const resource of resources) {
   const roles = ['clients', 'appointments'].includes(resource)
     ? ['admin', 'manager', 'operator']
     : ['admin', 'manager'];
-  managementRoutes.get(`/${resource}`, async (_req, res) => res.json(await listResource(resource)));
+  managementRoutes.get(`/${resource}`, async (req, res) =>
+    res.json(await listResource(resource, scope(req)))
+  );
   managementRoutes.post(`/${resource}`, permit(...roles), async (req, res) =>
-    res.status(201).json(await saveResource(resource, null, req.body, req.user))
+    res.status(201).json(await saveResource(resource, null, req.body, scope(req)))
   );
   managementRoutes.put(`/${resource}/:id`, permit(...roles), async (req, res) =>
-    res.json(await saveResource(resource, identifier(req.params.id), req.body, req.user))
+    res.json(await saveResource(resource, identifier(req.params.id), req.body, scope(req)))
   );
   managementRoutes.delete(`/${resource}/:id`, permit(...roles), async (req, res) =>
-    res.json(await archiveResource(resource, identifier(req.params.id)))
+    res.json(await archiveResource(resource, identifier(req.params.id), scope(req)))
   );
 }
-managementRoutes.get('/stock/movements', async (_req, res) => res.json(await listMovements()));
+managementRoutes.get('/stock/movements', async (req, res) => res.json(await listMovements(scope(req))));
 managementRoutes.post('/stock/movements', permit('admin', 'manager'), async (req, res) =>
-  res.status(201).json(await stockMovement(req.body, req.user.id))
+  res.status(201).json(await stockMovement(req.body, scope(req)))
 );
-managementRoutes.get('/sales', async (_req, res) => res.json(await listSales()));
-managementRoutes.get('/sales/:id', async (req, res) => res.json(await saleDetail(identifier(req.params.id))));
+managementRoutes.get('/sales', async (req, res) => res.json(await listSales(scope(req))));
+managementRoutes.get('/sales/:id', async (req, res) =>
+  res.json(await saleDetail(identifier(req.params.id), scope(req)))
+);
 managementRoutes.post('/sales', async (req, res) =>
-  res.status(201).json(await createSale(req.body, req.user.id))
+  res.status(201).json(await createSale(req.body, scope(req)))
 );
 managementRoutes.post('/sales/:id/cancel', permit('admin', 'manager'), async (req, res) =>
-  res.json(await cancelSale(identifier(req.params.id), req.body.reason, req.user.id))
+  res.json(await cancelSale(identifier(req.params.id), req.body.reason, scope(req)))
 );
 managementRoutes.get('/reports', async (req, res) =>
-  res.json(await report(String(req.query.from || ''), String(req.query.to || '')))
+  res.json(await report(String(req.query.from || ''), String(req.query.to || ''), scope(req)))
 );

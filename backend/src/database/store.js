@@ -35,11 +35,7 @@ export async function initializeStore() {
       if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
       sqlite = new DatabaseSync(path);
       sqlite.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;');
-      sqlite.exec(
-        schema
-          .replaceAll('INT PRIMARY KEY AUTO_INCREMENT', 'INTEGER PRIMARY KEY AUTOINCREMENT')
-          .replace('INSERT IGNORE INTO', 'INSERT OR IGNORE INTO')
-      );
+      sqlite.exec(schema.replaceAll('INT PRIMARY KEY AUTO_INCREMENT', 'INTEGER PRIMARY KEY AUTOINCREMENT'));
     } else {
       for (const statement of schema
         .split(';')
@@ -47,6 +43,7 @@ export async function initializeStore() {
         .filter(Boolean))
         await getPool().query(statement);
     }
+    await migrateCompanies();
   })();
   try {
     await initialized;
@@ -54,6 +51,50 @@ export async function initializeStore() {
     initialized = undefined;
     throw error;
   }
+}
+
+const tenantTables = [
+  'users',
+  'clients',
+  'categories',
+  'suppliers',
+  'items',
+  'sales',
+  'stock_movements',
+  'appointments'
+];
+
+async function raw(sql, values = []) {
+  if (driver === 'sqlite') return sqlite.prepare(sql).all(...values);
+  const [rows] = await getPool().query(sql, values);
+  return rows;
+}
+
+async function hasColumn(table, column) {
+  if (driver === 'sqlite')
+    return (await raw(`PRAGMA table_info(${table})`)).some((row) => row.name === column);
+  const rows = await raw(
+    'SELECT COUNT(*) AS total FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?',
+    [table, column]
+  );
+  return Number(rows[0].total) > 0;
+}
+
+async function migrateCompanies() {
+  let migrated = false;
+  for (const table of tenantTables) {
+    if (await hasColumn(table, 'company_id')) continue;
+    const statement = `ALTER TABLE ${table} ADD COLUMN company_id INT NOT NULL DEFAULT 1`;
+    if (driver === 'sqlite') sqlite.exec(statement);
+    else await getPool().query(statement);
+    migrated = true;
+  }
+  if (!migrated || !(await raw('SELECT id FROM users LIMIT 1')).length) return;
+  if ((await raw('SELECT id FROM companies WHERE id = 1')).length) return;
+  const statement = 'INSERT INTO companies (id, name, created_at) VALUES (1, ?, ?)';
+  const values = ['Meu negócio', new Date().toISOString()];
+  if (driver === 'sqlite') sqlite.prepare(statement).run(...values);
+  else await getPool().query(statement, values);
 }
 
 async function execute(sql, values = []) {

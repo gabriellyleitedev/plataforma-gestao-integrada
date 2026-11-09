@@ -42,20 +42,35 @@ async function request(path, method = 'GET', body, auth = token, expected = 200)
 
 test('fluxo integrado de gestão com banco isolado', async (t) => {
   let client, category, supplier, product, service, sale, operatorToken;
-  await t.test('primeiro administrador e autenticação sem senha padrão', async () => {
-    assert.equal((await request('/setup')).needsSetup, true);
+  await t.test('cadastro cria o negócio e o administrador sem senha padrão', async () => {
+    assert.ok(['mysql', 'sqlite'].includes((await request('/status')).storage));
     await request(
-      '/setup',
+      '/auth/register',
       'POST',
-      { name: 'Administrador de teste', email: 'admin@example.test', password },
+      { name: 'Sem negócio', email: 'semnegocio@example.test', password },
+      null,
+      400
+    );
+    await request(
+      '/auth/register',
+      'POST',
+      { name: 'Administrador de teste', company: 'Negócio de teste', email: 'admin@example.test', password },
       null,
       201
     );
-    await request('/setup', 'POST', { name: 'Outro', email: 'other@example.test', password }, null, 409);
+    await request(
+      '/auth/register',
+      'POST',
+      { name: 'Outro', company: 'Outro negócio', email: 'admin@example.test', password },
+      null,
+      409
+    );
+    assert.equal(Number((await one('SELECT COUNT(*) AS total FROM companies')).total), 1);
     await request('/auth/login', 'POST', { email: 'admin@example.test', password: 'incorreta' }, null, 401);
     const session = await request('/auth/login', 'POST', { email: 'admin@example.test', password }, null);
     token = session.token;
     assert.equal(session.user.role, 'admin');
+    assert.equal(session.user.company, 'Negócio de teste');
     assert.equal((await request('/auth/me')).email, 'admin@example.test');
     const stored = await one('SELECT password_hash FROM users WHERE id = 1');
     assert.notEqual(stored.password_hash, password);
@@ -326,5 +341,59 @@ test('fluxo integrado de gestão com banco isolado', async (t) => {
     }
     await request('/auth/login', 'POST', { email: 'alvo@example.test', password: 'incorreta' }, null, 429);
     await request('/auth/login', 'POST', { email: 'admin@example.test', password: 'incorreta' }, null, 401);
+  });
+  await t.test('cada negócio acessa somente os próprios dados', async () => {
+    await request(
+      '/auth/register',
+      'POST',
+      { name: 'Outra pessoa', company: 'Outro negócio', email: 'outro@example.test', password },
+      null,
+      201
+    );
+    const other = (await request('/auth/login', 'POST', { email: 'outro@example.test', password }, null))
+      .token;
+    assert.deepEqual(await request('/clients', 'GET', undefined, other), []);
+    assert.deepEqual(await request('/items', 'GET', undefined, other), []);
+    assert.deepEqual(await request('/sales', 'GET', undefined, other), []);
+    assert.deepEqual(await request('/stock/movements', 'GET', undefined, other), []);
+    assert.deepEqual(
+      (await request('/users', 'GET', undefined, other)).map((user) => user.email),
+      ['outro@example.test']
+    );
+    const period = new Date().toISOString().slice(0, 10);
+    const summary = await request(`/reports?from=${period}&to=${period}`, 'GET', undefined, other);
+    assert.equal(summary.revenue_cents, 0);
+    assert.equal(summary.clients_count, 0);
+    await request(`/sales/${sale.id}`, 'GET', undefined, other, 404);
+    await request(`/sales/${sale.id}/cancel`, 'POST', { reason: 'Invasão' }, other, 404);
+    await request(`/clients/${client.id}`, 'PUT', { name: 'Alterado' }, other, 404);
+    await request(`/items/${product.id}`, 'DELETE', undefined, other, 404);
+    await request(
+      '/users/1',
+      'PUT',
+      { name: 'X', email: 'x@example.test', role: 'admin', active: false },
+      other,
+      404
+    );
+    await request(
+      '/stock/movements',
+      'POST',
+      { item_id: product.id, type: 'entry', quantity: 1, reason: 'Invasão' },
+      other,
+      400
+    );
+    await request(
+      '/sales',
+      'POST',
+      { client_id: client.id, payment_method: 'pix', items: [{ item_id: product.id, quantity: 1 }] },
+      other,
+      400
+    );
+    const owned = await request('/clients', 'POST', { name: 'Cliente próprio' }, other, 201);
+    assert.equal(
+      owned.company_id,
+      (await one('SELECT company_id FROM users WHERE email = ?', ['outro@example.test'])).company_id
+    );
+    assert.ok(!(await request('/clients', 'GET', undefined, token)).some((row) => row.id === owned.id));
   });
 });

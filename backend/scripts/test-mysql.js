@@ -3,7 +3,6 @@ import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-// Geramos o nome aqui para remover somente o banco criado pelo teste.
 const name = `pgi_test_${randomBytes(12).toString('hex')}`;
 const ssl = (process.env.TEST_MYSQL_SSL ?? process.env.DB_SSL) === 'true';
 const options = {

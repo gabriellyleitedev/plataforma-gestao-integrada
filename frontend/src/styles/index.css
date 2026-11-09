@@ -112,9 +112,15 @@ button {
   font-size: 11px;
   font-weight: 700;
 }
+.workspace-label > div {
+  min-width: 0;
+}
 .workspace-label strong {
   display: block;
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .workspace-label small {
   display: block;
@@ -1018,6 +1024,18 @@ tbody tr:hover {
 .login-form .button {
   margin-top: 10px;
   min-height: 44px;
+}
+.login-switch {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  font-size: 12px;
+  color: #8b9c9e;
+}
+.login-switch .text-button {
+  font-size: 12px;
 }
 .login-footnote {
   margin-top: 30px;

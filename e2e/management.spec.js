@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { randomBytes } from 'node:crypto';
 
 test('mostramos falha de configuração sem afirmar conexão com o banco', async ({ page }) => {
-  await page.route('**/api/setup', (route) =>
+  await page.route('**/api/status', (route) =>
     route.fulfill({ status: 404, contentType: 'text/plain', body: 'Not found' })
   );
   await page.goto('/entrar');
@@ -12,7 +12,7 @@ test('mostramos falha de configuração sem afirmar conexão com o banco', async
 });
 
 test('recusamos resposta HTML no endereço da API sem interromper a tela', async ({ page }) => {
-  await page.route('**/api/setup', (route) =>
+  await page.route('**/api/status', (route) =>
     route.fulfill({ status: 200, contentType: 'text/html', body: '<html>Frontend</html>' })
   );
   await page.goto('/entrar');
@@ -25,13 +25,17 @@ test('cadastros, venda, dashboard e estoque pelo navegador', async ({ page }) =>
   page.on('pageerror', (error) => errors.push(error.message));
   const password = randomBytes(16).toString('hex');
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Vamos começar?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Acesse seu espaço' })).toBeVisible();
+  await page.getByRole('button', { name: 'Criar conta' }).click();
+  await expect(page.getByRole('heading', { name: 'Crie sua conta' })).toBeVisible();
   await page.getByLabel('Seu nome').fill('Administrador E2E');
+  await page.getByLabel('Nome do negócio').fill('Loja E2E');
   await page.getByLabel('E-mail', { exact: true }).fill('browser@example.test');
   await page.getByLabel('Senha', { exact: true }).fill(password);
   await page.getByLabel('Confirme a senha').fill(password);
   await page.getByRole('button', { name: 'Criar conta e começar' }).click();
   await expect(page.getByRole('heading', { name: /Olá, Administrador/ })).toBeVisible();
+  await expect(page.getByText('Loja E2E', { exact: true })).toBeVisible();
 
   await page.getByRole('link', { name: 'Clientes', exact: true }).click();
   await page.getByRole('button', { name: 'Novo cliente' }).first().click();

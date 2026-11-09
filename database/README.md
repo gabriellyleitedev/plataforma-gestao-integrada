@@ -1,6 +1,6 @@
 # Banco de dados
 
-Usamos MySQL 8.4 LTS e mantemos o schema em `migrations/001-schema.mysql.sql`. Para desenvolver sem servidor de banco, também usamos SQLite no arquivo `backend/data/platform.sqlite`. Inicializamos as tabelas ao abrir a API e criamos o primeiro administrador pela interface.
+Usamos MySQL 8.4 LTS e mantemos o schema em `migrations/001-schema.mysql.sql`. Para desenvolver sem servidor de banco, também usamos SQLite no arquivo `backend/data/platform.sqlite`. Inicializamos as tabelas ao abrir a API e criamos as contas pela interface. Bancos criados antes do multiempresa recebem `company_id` automaticamente, e os dados existentes ficam no primeiro negócio.
 
 ## Configuração
 
@@ -22,6 +22,7 @@ No desenvolvimento com SQLite, mantemos o arquivo fora do Git. Para backup, para
 
 | Tabela | Conteúdo |
 | --- | --- |
+| companies | Negócios cadastrados |
 | users / sessions | Usuários, hashes, perfis e sessões |
 | clients | Clientes e contatos |
 | categories / suppliers | Categorias e fornecedores |
@@ -29,6 +30,5 @@ No desenvolvimento com SQLite, mantemos o arquivo fora do Git. Para backup, para
 | appointments | Atendimentos e agenda |
 | sales / sale_items | Vendas e valores históricos dos itens |
 | stock_movements | Variação, saldo final, motivo e responsável |
-| setup_lock | Bloqueio da criação do primeiro administrador |
 
 Usamos chaves estrangeiras, consultas parametrizadas e transações. Arquivamos cadastros e cancelamos vendas sem apagar histórico. Não permitimos saldo negativo.

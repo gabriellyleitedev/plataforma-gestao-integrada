@@ -87,7 +87,7 @@ export function AppLayout() {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState(false);
   const [error, setError] = useState('');
-  const storage = useData('/setup');
+  const storage = useData('/status');
   if (loading) return <Loading />;
   if (!user) return <Navigate to="/entrar" replace />;
   return (
@@ -100,9 +100,9 @@ export function AppLayout() {
           Integra<span className="brand-dot">.</span>
         </NavLink>
         <div className="workspace-label">
-          <span className="workspace-avatar">ME</span>
+          <span className="workspace-avatar">{initials(user.company || 'Meu negócio')}</span>
           <div>
-            <strong>Meu negócio</strong>
+            <strong>{user.company || 'Meu negócio'}</strong>
             <small>Gestão integrada</small>
           </div>
         </div>

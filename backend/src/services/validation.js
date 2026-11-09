@@ -36,7 +36,10 @@ export function date(value) {
     fail(400, 'Data inválida.');
   return new Date(value).toISOString();
 }
-export async function reference(one, table, id, label) {
-  if (id !== null && !(await one(`SELECT id FROM ${table} WHERE id = ? AND archived = 0`, [id])))
+export async function reference(one, table, id, label, companyId) {
+  if (
+    id !== null &&
+    !(await one(`SELECT id FROM ${table} WHERE id = ? AND company_id = ? AND archived = 0`, [id, companyId]))
+  )
     fail(400, `${label} não encontrado ou arquivado.`);
 }

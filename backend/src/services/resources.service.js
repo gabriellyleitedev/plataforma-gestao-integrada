@@ -3,7 +3,7 @@ import { text, email, integer, choice, optionalId, date, reference, fail } from 
 
 export const resources = ['clients', 'categories', 'suppliers', 'items', 'appointments'];
 const cleanNotes = (value) => text(value, 'Observações', { required: false, max: 5000 });
-async function fieldsFor(resource, data, user) {
+async function fieldsFor(resource, data, companyId) {
   if (['clients', 'suppliers'].includes(resource))
     return {
       name: text(data.name, 'Nome'),
@@ -30,8 +30,8 @@ async function fieldsFor(resource, data, user) {
       fields.stock_minimum = 0;
       fields.supplier_id = null;
     }
-    await reference(one, 'categories', fields.category_id, 'Categoria');
-    await reference(one, 'suppliers', fields.supplier_id, 'Fornecedor');
+    await reference(one, 'categories', fields.category_id, 'Categoria', companyId);
+    await reference(one, 'suppliers', fields.supplier_id, 'Fornecedor', companyId);
     return fields;
   }
   const fields = {
@@ -42,35 +42,43 @@ async function fieldsFor(resource, data, user) {
     status: choice(data.status || 'open', ['open', 'in_progress', 'completed', 'cancelled'], 'Status')
   };
   if (!fields.client_id) fail(400, 'Selecione um cliente.');
-  await reference(one, 'clients', fields.client_id, 'Cliente');
-  if (user) fields.user_id = user.id;
+  await reference(one, 'clients', fields.client_id, 'Cliente', companyId);
   return fields;
 }
 
-export async function listResource(resource) {
+export async function listResource(resource, { companyId }) {
   if (resource === 'items')
     return (
       await query(
-        'SELECT i.*, c.name AS category_name, s.name AS supplier_name FROM items i LEFT JOIN categories c ON c.id = i.category_id LEFT JOIN suppliers s ON s.id = i.supplier_id WHERE i.archived = 0 ORDER BY i.id DESC'
+        'SELECT i.*, c.name AS category_name, s.name AS supplier_name FROM items i LEFT JOIN categories c ON c.id = i.category_id LEFT JOIN suppliers s ON s.id = i.supplier_id WHERE i.company_id = ? AND i.archived = 0 ORDER BY i.id DESC',
+        [companyId]
       )
     ).rows;
   if (resource === 'appointments')
     return (
       await query(
-        'SELECT a.*, c.name AS client_name, u.name AS user_name FROM appointments a JOIN clients c ON c.id = a.client_id JOIN users u ON u.id = a.user_id WHERE a.archived = 0 ORDER BY a.scheduled_at DESC'
+        'SELECT a.*, c.name AS client_name, u.name AS user_name FROM appointments a JOIN clients c ON c.id = a.client_id JOIN users u ON u.id = a.user_id WHERE a.company_id = ? AND a.archived = 0 ORDER BY a.scheduled_at DESC',
+        [companyId]
       )
     ).rows;
-  return (await query(`SELECT * FROM ${resource} WHERE archived = 0 ORDER BY id DESC`)).rows;
+  return (
+    await query(`SELECT * FROM ${resource} WHERE company_id = ? AND archived = 0 ORDER BY id DESC`, [
+      companyId
+    ])
+  ).rows;
 }
 
-export async function saveResource(resource, id, data, user) {
+export async function saveResource(resource, id, data, { userId, companyId }) {
   return transaction(async () => {
     let old;
     if (id) {
-      old = await one(`SELECT * FROM ${resource} WHERE id = ? AND archived = 0${lock}`, [id]);
+      old = await one(`SELECT * FROM ${resource} WHERE id = ? AND company_id = ? AND archived = 0${lock}`, [
+        id,
+        companyId
+      ]);
       if (!old) fail(404, 'Registro não encontrado.');
     }
-    const fields = await fieldsFor(resource, data, resource === 'appointments' && !id ? user : null);
+    const fields = await fieldsFor(resource, data, companyId);
     if (resource === 'items' && old && fields.type !== old.type) {
       if (
         old.stock ||
@@ -86,14 +94,24 @@ export async function saveResource(resource, id, data, user) {
           .join(', ')} WHERE id = ?`,
         [...Object.values(fields), id]
       );
-    } else id = await insert(resource, { ...fields, created_at: new Date().toISOString() });
+    } else {
+      id = await insert(resource, {
+        ...fields,
+        ...(resource === 'appointments' ? { user_id: userId } : {}),
+        company_id: companyId,
+        created_at: new Date().toISOString()
+      });
+    }
     return one(`SELECT * FROM ${resource} WHERE id = ?`, [id]);
   });
 }
 
-export async function archiveResource(resource, id) {
+export async function archiveResource(resource, id, { companyId }) {
   return transaction(async () => {
-    const old = await one(`SELECT * FROM ${resource} WHERE id = ? AND archived = 0${lock}`, [id]);
+    const old = await one(
+      `SELECT * FROM ${resource} WHERE id = ? AND company_id = ? AND archived = 0${lock}`,
+      [id, companyId]
+    );
     if (!old) fail(404, 'Registro não encontrado.');
     if (resource === 'items' && old.stock !== 0)
       fail(409, 'Zere o estoque por uma movimentação antes de arquivar o produto.');

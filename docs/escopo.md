@@ -16,11 +16,11 @@ Desenvolvemos uma plataforma web para reunir a gestão de clientes, catálogo, a
 | Vendas | Itens, pagamento, total, baixa de produtos e cancelamento |
 | Dashboard | Faturamento, vendas, ticket médio, clientes, gráfico e alertas |
 | Relatórios | Período, margem estimada, estoque atual e exportação CSV |
-| Acesso | Login, sessões, troca de senha e perfis de usuário |
+| Acesso | Cadastro aberto por negócio, login, sessões, troca de senha e perfis de usuário |
 
 ## Regras
 
-- Trabalhamos com uma empresa por instalação.
+- Cada cadastro cria um negócio próprio, e os dados de um negócio não aparecem para outro.
 - Usamos quantidades inteiras e valores em centavos.
 - Iniciamos produtos com saldo zero e movimentamos somente por estoque, venda ou cancelamento.
 - Não movimentamos estoque de serviços.
@@ -35,4 +35,4 @@ Desenvolvemos uma plataforma web para reunir a gestão de clientes, catálogo, a
 
 Para evoluir o sistema, revisaremos a necessidade de quantidades fracionadas, outras permissões e recuperação de senha por e-mail.
 
-Não incluímos emissão fiscal, processamento de pagamentos, contabilidade ou múltiplas empresas no mesmo banco.
+Não incluímos emissão fiscal, processamento de pagamentos ou contabilidade.

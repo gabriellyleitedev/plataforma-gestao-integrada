@@ -1,17 +1,20 @@
 import { randomBytes, scryptSync, timingSafeEqual, createHash } from 'node:crypto';
 import { promisify } from 'node:util';
 import { scrypt } from 'node:crypto';
-import { one, query, insert, transaction, lock, driver } from '../database/store.js';
+import { one, query, insert, transaction, driver } from '../database/store.js';
 import { text, email, choice, fail } from './validation.js';
 
 const derive = promisify(scrypt);
-const publicUser = ({ id, name, email, role, active }) => ({
+const publicUser = ({ id, name, email, role, active, company_name }) => ({
   id,
   name,
   email,
   role,
-  active: Boolean(active)
+  active: Boolean(active),
+  ...(company_name ? { company: company_name } : {})
 });
+const userWithCompany =
+  'SELECT u.*, c.name AS company_name FROM users u JOIN companies c ON c.id = u.company_id';
 const hashToken = (token) => createHash('sha256').update(token).digest('hex');
 const dummySalt = randomBytes(16).toString('hex');
 const dummyHash = `${dummySalt}:${scryptSync(randomBytes(32), dummySalt, 64).toString('hex')}`;
@@ -29,8 +32,9 @@ export async function hashPassword(password) {
   return `${salt}:${(await derive(password, salt, 64)).toString('hex')}`;
 }
 
-export async function createUser(data) {
+export async function createUser(data, companyId) {
   const fields = {
+    company_id: companyId,
     name: text(data.name, 'Nome'),
     email: email(data.email, true),
     role: choice(data.role, ['admin', 'manager', 'operator'], 'Perfil'),
@@ -44,14 +48,14 @@ export async function createUser(data) {
   return publicUser({ ...fields, id });
 }
 
-export async function setupStatus() {
-  return { needsSetup: !(await one('SELECT id FROM users LIMIT 1')), storage: driver };
+export async function status() {
+  return { storage: driver };
 }
-export async function setup(data) {
+export async function register(data) {
+  const company = text(data.company, 'Nome do negócio');
   return transaction(async () => {
-    await one(`SELECT id FROM setup_lock WHERE id = 1${lock}`);
-    if ((await setupStatus()).needsSetup === false) fail(409, 'O administrador inicial já foi criado.');
-    return createUser({ ...data, role: 'admin' });
+    const companyId = await insert('companies', { name: company, created_at: new Date().toISOString() });
+    return createUser({ ...data, role: 'admin' }, companyId);
   });
 }
 const attempts = new Map();
@@ -62,8 +66,7 @@ export async function login(data, ip) {
   for (const [entry, value] of attempts) if (value.until < now) attempts.delete(entry);
   const attempt = attempts.get(key);
   if (attempt?.count >= 10) fail(429, 'Muitas tentativas. Aguarde 15 minutos.');
-  const user = await one('SELECT * FROM users WHERE email = ?', [address]);
-  // Comparamos o hash também para e-mails inexistentes, reduzindo diferenças de tempo.
+  const user = await one(`${userWithCompany} WHERE u.email = ?`, [address]);
   const valid = await verifyPassword(data.password, user?.password_hash);
   if (!user || !user.active || !valid) {
     attempts.set(key, { count: (attempt?.count || 0) + 1, until: attempt?.until || now + 900000 });
@@ -84,11 +87,12 @@ export async function authenticate(req, _res, next) {
     const token = req.headers.authorization?.match(/^Bearer ([a-f0-9]{64})$/)?.[1];
     if (!token) fail(401, 'Entre na sua conta para continuar.');
     const user = await one(
-      'SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ? AND s.expires_at > ? AND u.active = 1',
+      `${userWithCompany} JOIN sessions s ON s.user_id = u.id WHERE s.token_hash = ? AND s.expires_at > ? AND u.active = 1`,
       [hashToken(token), new Date().toISOString()]
     );
     if (!user) fail(401, 'Sessão expirada. Entre novamente.');
     req.user = publicUser(user);
+    req.companyId = user.company_id;
     req.tokenHash = hashToken(token);
     next();
   } catch (error) {

@@ -99,11 +99,7 @@ try {
   process.exitCode = 1;
 } finally {
   if (connection) {
-    try {
-      await connection.query('SHUTDOWN');
-    } catch {
-      /* Aceitamos o fechamento da conexão durante o shutdown. */
-    }
+    await connection.query('SHUTDOWN').catch(() => {});
     await connection.end().catch(() => {});
   }
   if (server.exitCode === null) {
