@@ -96,40 +96,42 @@ export function LoginPage() {
           ) : (
             <form onSubmit={submit} key={creating ? 'register' : 'login'}>
               {creating && (
-                <>
+                <div className="field-pair">
                   <Field label="Seu nome">
                     <input name="name" required maxLength={160} autoComplete="name" />
                   </Field>
                   <Field label="Nome do negócio">
                     <input name="company" required maxLength={160} autoComplete="organization" />
                   </Field>
-                </>
+                </div>
               )}
               <Field label="E-mail">
                 <input name="email" type="email" required maxLength={190} autoComplete="username" />
               </Field>
-              <Field label="Senha" hint={creating ? 'Use entre 10 e 128 caracteres.' : undefined}>
-                <input
-                  name="password"
-                  type="password"
-                  required
-                  minLength={creating ? 10 : 1}
-                  maxLength={128}
-                  autoComplete={creating ? 'new-password' : 'current-password'}
-                />
-              </Field>
-              {creating && (
-                <Field label="Confirme a senha">
+              <div className={creating ? 'field-pair' : undefined}>
+                <Field label="Senha" hint={creating ? 'Mínimo de 10 caracteres.' : undefined}>
                   <input
-                    name="confirmation"
+                    name="password"
                     type="password"
                     required
-                    minLength={10}
+                    minLength={creating ? 10 : 1}
                     maxLength={128}
-                    autoComplete="new-password"
+                    autoComplete={creating ? 'new-password' : 'current-password'}
                   />
                 </Field>
-              )}
+                {creating && (
+                  <Field label="Confirme a senha">
+                    <input
+                      name="confirmation"
+                      type="password"
+                      required
+                      minLength={10}
+                      maxLength={128}
+                      autoComplete="new-password"
+                    />
+                  </Field>
+                )}
+              </div>
               <Message>{failure}</Message>
               <button className="button primary full" disabled={busy}>
                 {busy ? 'Aguarde…' : creating ? 'Criar conta e começar' : 'Entrar'}

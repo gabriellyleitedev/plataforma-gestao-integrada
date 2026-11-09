@@ -946,11 +946,12 @@ tbody tr:hover {
 .login-page {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 .login-story {
   background: #eaf4ef;
-  padding: 55px 12%;
+  padding: clamp(28px, 7vh, 55px) 12%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -972,7 +973,7 @@ tbody tr:hover {
   font-size: clamp(36px, 4vw, 60px);
   letter-spacing: -2.5px;
   line-height: 1.12;
-  margin: 20px 0 25px;
+  margin: clamp(10px, 2.5vh, 20px) 0 clamp(14px, 3vh, 25px);
   font-weight: 700;
   color: #194c43;
 }
@@ -988,7 +989,7 @@ tbody tr:hover {
   margin-top: 30px;
 }
 .story-grid {
-  margin-top: 35px;
+  margin-top: clamp(18px, 4vh, 35px);
   display: grid;
   gap: 16px;
 }
@@ -1003,23 +1004,33 @@ tbody tr:hover {
   display: grid;
   place-items: center;
   background: #fff;
-  padding: 40px;
+  padding: clamp(20px, 4vh, 40px) 40px;
+  overflow-y: auto;
 }
 .login-form {
-  max-width: 355px;
+  max-width: 400px;
   width: 100%;
 }
 .login-form h2 {
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.9px;
-  margin: 12px 0;
+  margin: clamp(6px, 1.5vh, 12px) 0;
 }
 .login-form > p:not(.eyebrow) {
   font-size: 12px;
   color: #8b9c9e;
   line-height: 1.8;
-  margin-bottom: 30px;
+  margin-bottom: clamp(16px, 3.5vh, 30px);
+}
+.login-form .field {
+  margin-bottom: clamp(10px, 2vh, 17px);
+}
+.field-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
 }
 .login-form .button {
   margin-top: 10px;
@@ -1030,7 +1041,7 @@ tbody tr:hover {
   justify-content: center;
   align-items: center;
   gap: 6px;
-  margin-top: 18px;
+  margin-top: clamp(10px, 2vh, 18px);
   font-size: 12px;
   color: #8b9c9e;
 }
@@ -1038,7 +1049,7 @@ tbody tr:hover {
   font-size: 12px;
 }
 .login-footnote {
-  margin-top: 30px;
+  margin-top: clamp(12px, 3vh, 30px);
   font-size: 10px;
   text-align: center;
   color: #99a7a7;
@@ -1127,11 +1138,14 @@ tbody tr:hover {
     display: none;
   }
   .login-panel {
-    min-height: 100vh;
-    padding: 30px;
+    padding: 24px;
   }
 }
 @media (max-width: 520px) {
+  .field-pair {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
   .page-heading {
     flex-direction: column;
   }

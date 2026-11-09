@@ -153,7 +153,7 @@ Somos cinco integrantes e dividimos a documentação entre toda a equipe.
 | 2 | Vitor Vaz | [Vitor-Vaz-2009](https://github.com/Vitor-Vaz-2009) | Frontend |
 | 3 | Raphael Nunes | [raphaelnsuzarte](https://github.com/raphaelnsuzarte) | Backend |
 | 4 | Vinicius Bueno | [vini-bg](https://github.com/vini-bg) | Banco de dados |
-| 5 | Joao Silva | A informar | Escopo e funcionalidades |
+| 5 | Joao Silva | — | Escopo e funcionalidades |
 
 Compartilhamos as decisões, revisamos as alterações e integramos os módulos por pull requests. Descrevemos nosso fluxo em [Trabalho em equipe](docs/equipe-e-git.md) e [Como contribuir](CONTRIBUTING.md).
 
