@@ -33,6 +33,21 @@ No plano gratuito do Render, a API entra em repouso após 15 minutos sem uso, e 
 
 Para publicar a API, incluímos `render.yaml` com o plano gratuito: [configurar no Render](https://render.com/deploy?repo=https://github.com/gabriellyleitedev/plataforma-gestao-integrada). Preenchemos as credenciais do MySQL e a origem da Vercel no painel do serviço. Depois, configuramos `VITE_API_URL` na Vercel com a URL pública da API terminando em `/api` e fazemos um novo deploy.
 
+## Acesso para avaliação
+
+Disponibilizamos uma conta de demonstração no ambiente publicado para professores e convidados testarem o sistema.
+
+| Campo | Valor |
+| --- | --- |
+| Endereço | https://plataforma-gestao-integrada.vercel.app |
+| E-mail | `demo@integra.com` |
+| Senha | `integra2026` |
+| Perfil | Gestor |
+
+Com essa conta, é possível cadastrar, editar e arquivar clientes, atendimentos, produtos, serviços, categorias e fornecedores, movimentar o estoque, registrar e cancelar vendas, consultar o dashboard e exportar relatórios. Apenas a gestão de usuários fica restrita aos administradores da equipe.
+
+Todos os visitantes compartilham os mesmos dados de demonstração. Se o primeiro acesso demorar, aguardamos até um minuto enquanto a API gratuita sai do repouso.
+
 ## Funcionalidades disponíveis
 
 - Login, logout, troca de senha e gestão de usuários com perfis administrador, gestor e operador.
