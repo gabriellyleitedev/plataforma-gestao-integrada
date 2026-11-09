@@ -27,7 +27,7 @@
 | Modelagem | SQL importável pelo Workbench, dicionário e guia em `database/modeling/` |
 | Configuração sem credenciais versionadas | Exemplos `.env.example`, `.gitignore` e gerador opcional de senhas locais |
 | Integração inicial | `/api/health`, proxy Vite e serviço HTTP com autenticação |
-| Equipe de seis integrantes | `docs/equipe-e-git.md`, `CONTRIBUTING.md`, modelos de issue/PR |
+| Equipe de cinco integrantes | `docs/equipe-e-git.md`, `CONTRIBUTING.md`, modelos de issue/PR |
 | Execução e integração | README, manual, guias local/API/arquitetura |
 | Verificações | Testes de API, persistência, concorrência, MySQL e navegador; jobs separados de CI |
 | Hospedagem sem custo | Configuração Vercel, instruções Render Free/Aiven Free |

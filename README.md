@@ -130,7 +130,7 @@ Organizamos o monorepo com npm workspaces e um único `package-lock.json`. Insta
 
 ## Autoria e equipe
 
-Planejamos o trabalho em seis frentes. Já definimos cinco responsáveis e ainda precisamos preencher o nome de documentação e os links de GitHub.
+Somos cinco integrantes. Dividimos a documentação entre toda a equipe e ainda vamos preencher os links de GitHub.
 
 | Integrante | Nome | GitHub | Responsabilidade |
 | --- | --- | --- | --- |
@@ -139,7 +139,6 @@ Planejamos o trabalho em seis frentes. Já definimos cinco responsáveis e ainda
 | 3 | Raphael Nunes | A informar | Backend |
 | 4 | Vinicius Bueno | A informar | Banco de dados |
 | 5 | Joao Silva | A informar | Escopo e funcionalidades |
-| 6 | A informar | A informar | Documentação |
 
 Compartilhamos as decisões, revisamos as alterações e integramos os módulos por pull requests. Descrevemos nosso fluxo em [Trabalho em equipe](docs/equipe-e-git.md) e [Como contribuir](CONTRIBUTING.md).
 
@@ -148,10 +147,9 @@ Compartilhamos as decisões, revisamos as alterações e integramos os módulos 
 | Informação | Preenchimento |
 | --- | --- |
 | Natureza do trabalho | Trabalho de Conclusão de Curso (TCC), em grupo |
-| Instituição de ensino | A informar |
-| Curso | A informar |
-| Orientador(a) | A informar |
-| Ano / semestre de apresentação | A informar |
+| Instituição de ensino | Etec Itaquera II |
+| Curso | Técnico em Desenvolvimento de Sistemas |
+| Ano / semestre de apresentação | 2026, 2º semestre |
 
 ## Cuidados com o repositório
 
@@ -159,4 +157,4 @@ Mantemos credenciais, certificados privados e dados reais fora do repositório. 
 
 ## Licença
 
-Ainda precisamos definir a licença de distribuição.
+Distribuímos o projeto sob a [licença MIT](LICENSE).
