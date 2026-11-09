@@ -59,7 +59,7 @@ Mais detalhes na pasta [docs](docs): [instalação](docs/desenvolvimento-local.m
 | Vitor Vaz | [Vitor-Vaz-2009](https://github.com/Vitor-Vaz-2009) | Frontend |
 | Raphael Nunes | [raphaelnsuzarte](https://github.com/raphaelnsuzarte) | Backend |
 | Vinicius Bueno | [vini-bg](https://github.com/vini-bg) | Banco de dados |
-| Joao Silva | — | Escopo e funcionalidades |
+| Joao Silva | [joaosilvaavitor-dot](https://github.com/joaosilvaavitor-dot) | Escopo e funcionalidades |
 
 ## Licença
 
