@@ -3,6 +3,7 @@ services:
     name: plataforma-gestao-api
     runtime: node
     plan: free
+    region: virginia
     buildCommand: npm ci --workspace backend --include-workspace-root=false --omit=dev
     startCommand: npm start -w backend
     healthCheckPath: /api/health

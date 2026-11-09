@@ -5,11 +5,13 @@ import { fileURLToPath } from 'node:url';
 
 // Geramos o nome aqui para remover somente o banco criado pelo teste.
 const name = `pgi_test_${randomBytes(12).toString('hex')}`;
+const ssl = (process.env.TEST_MYSQL_SSL ?? process.env.DB_SSL) === 'true';
 const options = {
   host: process.env.TEST_MYSQL_HOST || process.env.DB_HOST || '127.0.0.1',
   port: Number(process.env.TEST_MYSQL_PORT || process.env.DB_PORT || 3306),
   user: process.env.TEST_MYSQL_USER || process.env.DB_USER,
-  password: process.env.TEST_MYSQL_PASSWORD ?? process.env.DB_PASSWORD ?? ''
+  password: process.env.TEST_MYSQL_PASSWORD ?? process.env.DB_PASSWORD ?? '',
+  ...(ssl ? { ssl: { rejectUnauthorized: true } } : {})
 };
 if (!options.user) throw new Error('Configure TEST_MYSQL_USER ou DB_USER para uma instância de teste.');
 let connection;
@@ -21,7 +23,7 @@ try {
   console.log('MySQL real: executando os fluxos em banco temporário isolado.');
   const child = spawn(process.execPath, ['--test', 'test/management.test.js'], {
     cwd: fileURLToPath(new URL('../', import.meta.url)), stdio: 'inherit',
-    env: { ...process.env, RUN_MYSQL_TEST: '1', NODE_ENV: 'test', DB_DRIVER: 'mysql', DB_HOST: options.host, DB_PORT: String(options.port), DB_USER: options.user, DB_PASSWORD: options.password, DB_NAME: name, DB_SSL: 'false' }
+    env: { ...process.env, RUN_MYSQL_TEST: '1', NODE_ENV: 'test', DB_DRIVER: 'mysql', DB_HOST: options.host, DB_PORT: String(options.port), DB_USER: options.user, DB_PASSWORD: options.password, DB_NAME: name, DB_SSL: String(ssl) }
   });
   const code = await new Promise((resolve, reject) => { child.once('error', reject); child.once('exit', resolve); });
   process.exitCode = code ?? 1;

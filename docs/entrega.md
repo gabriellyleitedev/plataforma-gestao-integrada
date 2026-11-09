@@ -30,7 +30,7 @@
 | Equipe de cinco integrantes | `docs/equipe-e-git.md`, `CONTRIBUTING.md`, modelos de issue/PR |
 | Execução e integração | README, manual, guias local/API/arquitetura |
 | Verificações | Testes de API, persistência, concorrência, MySQL e navegador; jobs separados de CI |
-| Hospedagem sem custo | Configuração Vercel, instruções Render Free/Aiven Free |
+| Hospedagem sem custo | Configuração Vercel, instruções Render Free/TiDB Cloud Starter |
 
 ## Resultado da validação
 

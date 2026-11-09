@@ -22,7 +22,7 @@ No primeiro acesso, criamos a conta de administrador e cadastramos os dados do n
 | Testes | Node.js Test Runner e Playwright |
 | Qualidade e integração | ESLint e GitHub Actions |
 | Versionamento | Git e GitHub, com branches e pull requests |
-| Hospedagem prevista | Vercel para interface, Render Free para API e Aiven Free para MySQL |
+| Hospedagem | Vercel para interface, Render Free para API e TiDB Cloud Starter para MySQL |
 
 Documentamos essas opções de hospedagem, mas ainda não publicamos a aplicação. Para executar localmente, não dependemos dos provedores.
 

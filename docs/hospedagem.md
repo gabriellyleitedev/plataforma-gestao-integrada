@@ -33,11 +33,19 @@ Usamos o `PORT` fornecido pela plataforma. Configuramos as credenciais `DB_*` so
 
 Consideramos a suspensão por inatividade e as cotas do [plano gratuito do Render](https://render.com/docs/free). Para MySQL, usamos um provedor separado.
 
-## MySQL no Aiven Free
+## MySQL no TiDB Cloud Starter
 
-Consideramos o [plano gratuito do Aiven](https://aiven.io/docs/products/mysql/concepts/mysql-free-tier). Antes de criar o serviço, conferimos disponibilidade e limites na conta.
+Usamos o [TiDB Cloud Starter](https://docs.pingcap.com/tidbcloud/serverless-limitations/), compatível com MySQL e gratuito sem prazo de expiração. Criamos a instância na AWS `us-east-1`, próxima da API, e mantemos o limite de gastos em US$ 0. Validamos os 14 fluxos de `npm run test:mysql` nessa instância.
 
-Configuramos host, porta, banco, usuário e senha no backend. Ativamos `DB_SSL=true` e mantemos a validação TLS. Se precisarmos da CA do provedor, colamos o PEM em `DB_SSL_CA` ou indicamos um arquivo em `DB_SSL_CA_PATH`. Não colocamos credenciais em `VITE_*`.
+| Variável | Valor |
+| --- | --- |
+| `DB_HOST` | Host público exibido em Connect |
+| `DB_PORT` | `4000` |
+| `DB_NAME` | `plataforma_gestao_integrada` |
+| `DB_USER` | Usuário exibido em Connect, com o prefixo da instância |
+| `DB_SSL` | `true`, sem CA adicional |
+
+Mantemos a validação TLS. O certificado do TiDB Cloud é emitido por uma autoridade pública, então não preenchemos `DB_SSL_CA`. Não colocamos credenciais em `VITE_*`.
 
 Em banco já provisionado, inicializamos as tabelas do schema com o usuário autorizado. Para transferir uma instalação local, planejamos o backup e a migração separadamente.
 
