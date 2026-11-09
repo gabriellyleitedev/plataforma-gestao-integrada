@@ -16,9 +16,16 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'node src/server.js', cwd: './backend',
+      command: 'node src/server.js',
+      cwd: './backend',
       url: 'http://localhost:3101/api/health',
-      env: { NODE_ENV: 'test', DB_DRIVER: 'sqlite', SQLITE_PATH: ':memory:', PORT: '3101', FRONTEND_URL: 'http://localhost:5179' },
+      env: {
+        NODE_ENV: 'test',
+        DB_DRIVER: 'sqlite',
+        SQLITE_PATH: ':memory:',
+        PORT: '3101',
+        FRONTEND_URL: 'http://localhost:5179'
+      },
       reuseExistingServer: false
     },
     {

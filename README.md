@@ -8,7 +8,7 @@ Nosso objetivo é reunir as rotinas administrativas de pequenos negócios em uma
 
 Atendemos comércios e prestadores de serviços. Separamos produtos de serviços para controlar o estoque apenas dos produtos. Detalhamos as funcionalidades no [escopo](docs/escopo.md).
 
-No primeiro acesso, criamos a conta de administrador e cadastramos os dados do negócio. Não usamos contas ou senhas padrão.
+No primeiro acesso, criamos a conta de administrador. Não usamos contas ou senhas padrão.
 
 ## Tecnologias
 
@@ -135,14 +135,14 @@ Organizamos o monorepo com npm workspaces e um único `package-lock.json`. Insta
 
 ## Autoria e equipe
 
-Somos cinco integrantes. Dividimos a documentação entre toda a equipe e ainda vamos preencher os links de GitHub.
+Somos cinco integrantes e dividimos a documentação entre toda a equipe.
 
 | Integrante | Nome | GitHub | Responsabilidade |
 | --- | --- | --- | --- |
-| 1 | Gabrielly dos Santos Leite | A informar | Infraestrutura |
-| 2 | Vitor Vaz | A informar | Frontend |
-| 3 | Raphael Nunes | A informar | Backend |
-| 4 | Vinicius Bueno | A informar | Banco de dados |
+| 1 | Gabrielly dos Santos Leite | [gabriellyleitedev](https://github.com/gabriellyleitedev) | Infraestrutura |
+| 2 | Vitor Vaz | [Vitor-Vaz-2009](https://github.com/Vitor-Vaz-2009) | Frontend |
+| 3 | Raphael Nunes | [raphaelnsuzarte](https://github.com/raphaelnsuzarte) | Backend |
+| 4 | Vinicius Bueno | [vini-bg](https://github.com/vini-bg) | Banco de dados |
 | 5 | Joao Silva | A informar | Escopo e funcionalidades |
 
 Compartilhamos as decisões, revisamos as alterações e integramos os módulos por pull requests. Descrevemos nosso fluxo em [Trabalho em equipe](docs/equipe-e-git.md) e [Como contribuir](CONTRIBUTING.md).

@@ -22,10 +22,25 @@ try {
   created = true;
   console.log('MySQL real: executando os fluxos em banco temporário isolado.');
   const child = spawn(process.execPath, ['--test', 'test/management.test.js'], {
-    cwd: fileURLToPath(new URL('../', import.meta.url)), stdio: 'inherit',
-    env: { ...process.env, RUN_MYSQL_TEST: '1', NODE_ENV: 'test', DB_DRIVER: 'mysql', DB_HOST: options.host, DB_PORT: String(options.port), DB_USER: options.user, DB_PASSWORD: options.password, DB_NAME: name, DB_SSL: String(ssl) }
+    cwd: fileURLToPath(new URL('../', import.meta.url)),
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      RUN_MYSQL_TEST: '1',
+      NODE_ENV: 'test',
+      DB_DRIVER: 'mysql',
+      DB_HOST: options.host,
+      DB_PORT: String(options.port),
+      DB_USER: options.user,
+      DB_PASSWORD: options.password,
+      DB_NAME: name,
+      DB_SSL: String(ssl)
+    }
   });
-  const code = await new Promise((resolve, reject) => { child.once('error', reject); child.once('exit', resolve); });
+  const code = await new Promise((resolve, reject) => {
+    child.once('error', reject);
+    child.once('exit', resolve);
+  });
   process.exitCode = code ?? 1;
 } catch (error) {
   console.error(`Teste MySQL falhou: ${error.code || error.message}`);

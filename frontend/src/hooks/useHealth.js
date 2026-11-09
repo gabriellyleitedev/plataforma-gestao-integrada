@@ -8,10 +8,18 @@ export function useHealth() {
     let cancelled = false;
     const timeout = setTimeout(() => controller.abort(), 8000);
     getHealth({ signal: controller.signal })
-      .then((data) => { if (!cancelled) setState({ status: 'success', data }); })
-      .catch(() => { if (!cancelled) setState({ status: 'error', data: null }); })
+      .then((data) => {
+        if (!cancelled) setState({ status: 'success', data });
+      })
+      .catch(() => {
+        if (!cancelled) setState({ status: 'error', data: null });
+      })
       .finally(() => clearTimeout(timeout));
-    return () => { cancelled = true; clearTimeout(timeout); controller.abort(); };
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, []);
   return state;
 }

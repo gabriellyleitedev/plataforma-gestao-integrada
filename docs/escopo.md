@@ -33,6 +33,6 @@ Desenvolvemos uma plataforma web para reunir a gestão de clientes, catálogo, a
 
 ## Próximas definições
 
-Ainda precisamos informar os perfis de GitHub da equipe e publicar a API com o banco MySQL. Para evoluir o sistema, revisaremos a necessidade de quantidades fracionadas, outras permissões e recuperação de senha por e-mail.
+Para evoluir o sistema, revisaremos a necessidade de quantidades fracionadas, outras permissões e recuperação de senha por e-mail.
 
 Não incluímos emissão fiscal, processamento de pagamentos, contabilidade ou múltiplas empresas no mesmo banco.
