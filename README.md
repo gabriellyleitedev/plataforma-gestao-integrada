@@ -24,7 +24,12 @@ No primeiro acesso, criamos a conta de administrador e cadastramos os dados do n
 | Versionamento | Git e GitHub, com branches e pull requests |
 | Hospedagem | Vercel para interface, Render Free para API e TiDB Cloud Starter para MySQL |
 
-Documentamos essas opções de hospedagem, mas ainda não publicamos a aplicação. Para executar localmente, não dependemos dos provedores.
+Publicamos a aplicação em planos gratuitos:
+
+- Interface: https://plataforma-gestao-integrada.vercel.app
+- API: https://plataforma-gestao-api-hywk.onrender.com/api/health
+
+No plano gratuito do Render, a API entra em repouso após 15 minutos sem uso, e o primeiro acesso seguinte leva cerca de um minuto. Para executar localmente, não dependemos dos provedores.
 
 Para publicar a API, incluímos `render.yaml` com o plano gratuito: [configurar no Render](https://render.com/deploy?repo=https://github.com/gabriellyleitedev/plataforma-gestao-integrada). Preenchemos as credenciais do MySQL e a origem da Vercel no painel do serviço. Depois, configuramos `VITE_API_URL` na Vercel com a URL pública da API terminando em `/api` e fazemos um novo deploy.
 

@@ -1,6 +1,12 @@
 # Hospedagem
 
-Planejamos usar planos gratuitos e conferir os limites antes da publicação. Ainda não provisionamos serviços em nuvem.
+Publicamos a aplicação somente em planos gratuitos, sem cartão cadastrado.
+
+| Parte | Provedor | Endereço |
+| --- | --- | --- |
+| Interface | Vercel | https://plataforma-gestao-integrada.vercel.app |
+| API | Render Free, região Virginia | https://plataforma-gestao-api-hywk.onrender.com |
+| Banco | TiDB Cloud Starter, AWS `us-east-1` | Acesso restrito à API |
 
 ## Frontend na Vercel
 
