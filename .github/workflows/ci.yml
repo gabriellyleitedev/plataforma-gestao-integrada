@@ -39,8 +39,6 @@ jobs:
           echo "::add-mask::$database_password"
           echo "TEST_MYSQL_PASSWORD=$database_password" >> "$GITHUB_ENV"
           docker run --name pgi-mysql --detach --publish 127.0.0.1:33307:3306 --env MYSQL_ROOT_HOST=% --env MYSQL_ROOT_PASSWORD="$database_password" mysql:8.4
-          # O entrypoint sobe um servidor temporário sem rede durante a inicialização.
-          # Esperamos o servidor definitivo aceitar TCP com a senha configurada.
           for attempt in {1..90}; do
             if docker exec -e MYSQL_PWD="$database_password" pgi-mysql mysql --protocol=TCP -h 127.0.0.1 -uroot -e 'SELECT 1' >/dev/null 2>&1; then break; fi
             sleep 2
