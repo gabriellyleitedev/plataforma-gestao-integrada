@@ -35,7 +35,8 @@
 ## Resultado da validação
 
 - Lint sem erros ou avisos; build de produção concluído.
-- 19 testes no conjunto padrão, incluindo persistência entre processos e concorrência.
+- 22 testes no conjunto padrão, incluindo configuração da URI MySQL, persistência e concorrência.
+- 14 testes do fluxo de gestão pela função da Vercel, em ambiente local isolado.
 - 14 testes do fluxo integrado executados contra MySQL Community 8.4.13 real, em banco temporário isolado.
 - Fluxo Playwright no Chrome em desktop/celular, com cadastros, estoque, venda, cancelamento, dashboard, CSV e permissões.
 - Nenhum teste insere registros no banco usado pelo usuário.

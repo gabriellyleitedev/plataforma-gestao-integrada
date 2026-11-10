@@ -1,0 +1,5 @@
+DB_DRIVER=mysql
+DATABASE_URL=
+DB_SSL=true
+DB_SSL_CA=
+VITE_API_URL=/api

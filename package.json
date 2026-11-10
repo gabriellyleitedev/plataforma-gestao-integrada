@@ -21,6 +21,7 @@
     "test": "npm run test -w backend",
     "test:e2e": "playwright test",
     "test:mysql": "npm run test:mysql -w backend",
+    "test:vercel": "node backend/scripts/check-vercel.js",
     "test:mysql:local": "node backend/scripts/mysql-portable-check.js",
     "db:check": "npm run db:check -w backend",
     "mysql:env": "node backend/scripts/create-mysql-env.js",

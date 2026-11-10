@@ -4,7 +4,8 @@ Executamos as verificações com Node.js 24.16.0 e npm 11.13.0.
 
 | Comando | Resultado |
 | --- | --- |
-| `npm run check` | Lint sem avisos, 19 testes aprovados e build concluído |
+| `npm run check` | Lint sem avisos, 22 testes aprovados e build concluído |
+| `npm run test:vercel` | 14 testes do fluxo de gestão pela função Vercel, em ambiente local isolado |
 | `npm run test:mysql:local` | 14 testes aprovados em MySQL Community 8.4.13 |
 | `npm run test:e2e` | Fluxo completo aprovado no Chrome, em desktop e celular |
 

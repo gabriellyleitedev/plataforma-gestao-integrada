@@ -1,6 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
+import { createServer } from 'node:http';
 
 if (process.env.RUN_MYSQL_TEST === '1') {
   if (!/^pgi_test_[a-f0-9]{24}$/.test(process.env.DB_NAME || '')) throw new Error('Teste MySQL exige banco temporário criado pelo runner.');
@@ -10,6 +11,7 @@ if (process.env.RUN_MYSQL_TEST === '1') {
   process.env.SQLITE_PATH = ':memory:';
 }
 const { app } = await import('../src/app.js');
+const handler = process.env.RUN_VERCEL_TEST === '1' ? (await import('../../frontend/api/[...path].js')).default : app;
 const { one } = await import('../src/database/store.js');
 const { closePool } = await import('../src/database/pool.js');
 let server;
@@ -17,7 +19,7 @@ let base;
 let token;
 const password = randomBytes(18).toString('hex');
 before(async () => {
-  server = app.listen(0, '127.0.0.1');
+  server = createServer(handler).listen(0, '127.0.0.1');
   await new Promise((resolve) => server.once('listening', resolve));
   base = `http://127.0.0.1:${server.address().port}/api`;
 });

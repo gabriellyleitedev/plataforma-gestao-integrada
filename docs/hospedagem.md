@@ -2,6 +2,8 @@
 
 Planejamos usar planos gratuitos e conferir os limites antes da publicação. Ainda não provisionamos serviços em nuvem.
 
+Para a configuração mais curta, seguimos o [guia Vercel](vercel.md): publicamos interface e API no mesmo projeto e conectamos MySQL pelas variáveis privadas. A configuração Render abaixo permanece como alternativa.
+
 ## Frontend na Vercel
 
 Importamos o repositório, selecionamos `frontend` como Root Directory e escolhemos o preset Vite. Usamos o lockfile da raiz e habilitamos o acesso aos arquivos externos à Root Directory quando necessário.

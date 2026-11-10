@@ -26,7 +26,7 @@ No primeiro acesso, criamos a conta de administrador e cadastramos os dados do n
 
 Documentamos essas opções de hospedagem, mas ainda não publicamos a aplicação. Para executar localmente, não dependemos dos provedores.
 
-Para publicar a API, incluímos `render.yaml` com o plano gratuito: [configurar no Render](https://render.com/deploy?repo=https://github.com/gabriellyleitedev/plataforma-gestao-integrada). Preenchemos as credenciais do MySQL e a origem da Vercel no painel do serviço. Depois, configuramos `VITE_API_URL` na Vercel com a URL pública da API terminando em `/api` e fazemos um novo deploy.
+Para simplificar a publicação, oferecemos interface e API no mesmo projeto da Vercel. Copiamos as variáveis do banco seguindo o [guia rápido](docs/vercel.md). Mantemos `render.yaml` como alternativa para uma API separada.
 
 ## Funcionalidades disponíveis
 
@@ -106,6 +106,7 @@ Organizamos o monorepo com npm workspaces e um único `package-lock.json`. Insta
 | `npm run check` | ESLint, testes de integração/persistência e build |
 | `npm run test:e2e` | Fluxo real de formulários e navegação no Chrome, em banco isolado |
 | `npm run test:mysql` | Fluxos de integração em uma instância MySQL de teste configurada |
+| `npm run test:vercel` | Fluxos de gestão pela função usada na Vercel, em banco isolado |
 | `npm run test:mysql:local` | Validação com pacote MySQL portátil, instalado conforme o guia |
 | `npm run mysql:env` | Gera configuração privada para o MySQL opcional via Docker |
 | `npm run build` | Gera `frontend/dist` |
@@ -124,6 +125,7 @@ Organizamos o monorepo com npm workspaces e um único `package-lock.json`. Insta
 - [Equipe, branches e pull requests](docs/equipe-e-git.md)
 - [Escopo e decisões pendentes](docs/escopo.md)
 - [Hospedagem gratuita](docs/hospedagem.md)
+- [Vercel com interface e API no mesmo projeto](docs/vercel.md)
 - [Banco de dados](database/README.md)
 - [Resultados e limites da validação](docs/validacao-inicial.md)
 - [Contribuição](CONTRIBUTING.md)
