@@ -36,4 +36,4 @@ Aplicamos permissões na API, Helmet, limite de JSON de 100 KB e limitação de 
 - Usamos a integração `@tailwindcss/vite` e `@import "tailwindcss"`.
 - Justificamos dependências novas no PR e atualizamos o lockfile da raiz.
 
-Trabalhamos com uma empresa por instalação. Não implementamos múltiplas empresas no mesmo banco, MFA, recuperação por e-mail ou processamento de pagamentos.
+Separamos os dados por negócio com `company_id` em todas as tabelas de cadastro e operação. A API obtém o negócio pela sessão e filtra cada consulta por ele, sem aceitar o identificador do negócio vindo do navegador. Não implementamos MFA, recuperação por e-mail ou processamento de pagamentos.

@@ -2,7 +2,9 @@ import { test, expect } from '@playwright/test';
 import { randomBytes } from 'node:crypto';
 
 test('mostramos falha de configuração sem afirmar conexão com o banco', async ({ page }) => {
-  await page.route('**/api/setup', (route) => route.fulfill({ status: 404, contentType: 'text/plain', body: 'Not found' }));
+  await page.route('**/api/status', (route) =>
+    route.fulfill({ status: 404, contentType: 'text/plain', body: 'Not found' })
+  );
   await page.goto('/entrar');
   await expect(page.getByRole('alert')).toContainText('Precisamos configurar a URL da API');
   await expect(page.getByText('Conexão com banco MySQL.', { exact: true })).toHaveCount(0);
@@ -10,7 +12,9 @@ test('mostramos falha de configuração sem afirmar conexão com o banco', async
 });
 
 test('recusamos resposta HTML no endereço da API sem interromper a tela', async ({ page }) => {
-  await page.route('**/api/setup', (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<html>Frontend</html>' }));
+  await page.route('**/api/status', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<html>Frontend</html>' })
+  );
   await page.goto('/entrar');
   await expect(page.getByRole('alert')).toContainText('Precisamos verificar a URL da API');
   await expect(page.getByText('Conexão com banco MySQL.', { exact: true })).toHaveCount(0);
@@ -21,13 +25,17 @@ test('cadastros, venda, dashboard e estoque pelo navegador', async ({ page }) =>
   page.on('pageerror', (error) => errors.push(error.message));
   const password = randomBytes(16).toString('hex');
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Vamos começar?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Acesse seu espaço' })).toBeVisible();
+  await page.getByRole('button', { name: 'Criar conta' }).click();
+  await expect(page.getByRole('heading', { name: 'Crie sua conta' })).toBeVisible();
   await page.getByLabel('Seu nome').fill('Administrador E2E');
+  await page.getByLabel('Nome do negócio').fill('Loja E2E');
   await page.getByLabel('E-mail', { exact: true }).fill('browser@example.test');
   await page.getByLabel('Senha', { exact: true }).fill(password);
   await page.getByLabel('Confirme a senha').fill(password);
   await page.getByRole('button', { name: 'Criar conta e começar' }).click();
   await expect(page.getByRole('heading', { name: /Olá, Administrador/ })).toBeVisible();
+  await expect(page.getByText('Loja E2E', { exact: true })).toBeVisible();
 
   await page.getByRole('link', { name: 'Clientes', exact: true }).click();
   await page.getByRole('button', { name: 'Novo cliente' }).first().click();
@@ -69,10 +77,26 @@ test('cadastros, venda, dashboard e estoque pelo navegador', async ({ page }) =>
   await page.getByRole('link', { name: 'Vendas', exact: true }).click();
   await page.getByRole('button', { name: 'Nova venda' }).click();
   await page.getByLabel('Cliente', { exact: true }).selectOption({ label: 'Cliente E2E' });
-  await page.getByLabel('Produto ou serviço da venda').selectOption(await page.getByLabel('Produto ou serviço da venda').locator('option').filter({ hasText: 'Produto E2E' }).getAttribute('value'));
+  await page
+    .getByLabel('Produto ou serviço da venda')
+    .selectOption(
+      await page
+        .getByLabel('Produto ou serviço da venda')
+        .locator('option')
+        .filter({ hasText: 'Produto E2E' })
+        .getAttribute('value')
+    );
   await page.getByRole('button', { name: 'Adicionar', exact: true }).click();
   await page.getByRole('spinbutton', { name: 'Quantidade de Produto E2E' }).fill('2');
-  await page.getByLabel('Produto ou serviço da venda').selectOption(await page.getByLabel('Produto ou serviço da venda').locator('option').filter({ hasText: 'Serviço E2E' }).getAttribute('value'));
+  await page
+    .getByLabel('Produto ou serviço da venda')
+    .selectOption(
+      await page
+        .getByLabel('Produto ou serviço da venda')
+        .locator('option')
+        .filter({ hasText: 'Serviço E2E' })
+        .getAttribute('value')
+    );
   await page.getByRole('button', { name: 'Adicionar', exact: true }).click();
   await page.getByRole('button', { name: 'Confirmar venda' }).click();
   await expect(page.getByRole('dialog')).toContainText('R$ 100,00');

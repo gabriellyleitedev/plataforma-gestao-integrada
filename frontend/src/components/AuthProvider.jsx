@@ -8,12 +8,27 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
     if (sessionStorage.getItem('pgi-token')) {
-      api('/auth/me').then((value) => { if (!cancelled) setUser(value); })
-        .catch(() => sessionStorage.removeItem('pgi-token')).finally(() => { if (!cancelled) setLoading(false); });
-    } else Promise.resolve().then(() => { if (!cancelled) setLoading(false); });
-    const expire = () => { sessionStorage.removeItem('pgi-token'); setUser(null); };
+      api('/auth/me')
+        .then((value) => {
+          if (!cancelled) setUser(value);
+        })
+        .catch(() => sessionStorage.removeItem('pgi-token'))
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    } else
+      Promise.resolve().then(() => {
+        if (!cancelled) setLoading(false);
+      });
+    const expire = () => {
+      sessionStorage.removeItem('pgi-token');
+      setUser(null);
+    };
     window.addEventListener('pgi-session-expired', expire);
-    return () => { cancelled = true; window.removeEventListener('pgi-session-expired', expire); };
+    return () => {
+      cancelled = true;
+      window.removeEventListener('pgi-session-expired', expire);
+    };
   }, []);
   async function signIn(email, password) {
     const result = await api('/auth/login', { method: 'POST', body: { email, password } });
@@ -21,8 +36,12 @@ export function AuthProvider({ children }) {
     setUser(result.user);
   }
   async function signOut() {
-    try { await api('/auth/logout', { method: 'POST' }); }
-    finally { sessionStorage.removeItem('pgi-token'); setUser(null); }
+    try {
+      await api('/auth/logout', { method: 'POST' });
+    } finally {
+      sessionStorage.removeItem('pgi-token');
+      setUser(null);
+    }
   }
   return <AuthContext.Provider value={{ user, loading, signIn, signOut }}>{children}</AuthContext.Provider>;
 }

@@ -6,7 +6,7 @@
 2. Clonamos o repositório e executamos `npm ci` na raiz.
 3. Copiamos os exemplos de ambiente para `.env` em frontend e backend, sem sobrescrever configurações existentes.
 4. Executamos `npm run dev`.
-5. Acessamos http://localhost:5173 e criamos o primeiro administrador. Para encerrar, usamos Ctrl+C.
+5. Acessamos http://localhost:5173 e criamos uma conta em **Criar conta**. Para encerrar, usamos Ctrl+C.
 
 No PowerShell com bloqueio de scripts, usamos `npm.cmd` no lugar de `npm`, sem alterar a política do computador.
 

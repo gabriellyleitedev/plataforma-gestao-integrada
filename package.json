@@ -18,6 +18,8 @@
     "build": "npm run build -w frontend",
     "start": "npm run start -w backend",
     "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "npm run test -w backend",
     "test:e2e": "playwright test",
     "test:mysql": "npm run test:mysql -w backend",
@@ -25,7 +27,7 @@
     "test:mysql:local": "node backend/scripts/mysql-portable-check.js",
     "db:check": "npm run db:check -w backend",
     "mysql:env": "node backend/scripts/create-mysql-env.js",
-    "check": "npm run lint && npm test && npm run build"
+    "check": "npm run format:check && npm run lint && npm test && npm run build"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -34,6 +36,7 @@
     "eslint": "10.14.0",
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.7",
-    "globals": "17.14.0"
+    "globals": "17.14.0",
+    "prettier": "3.6.2"
   }
 }

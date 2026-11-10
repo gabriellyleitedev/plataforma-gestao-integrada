@@ -12,7 +12,8 @@ export function text(value, label, { required = true, max = 160 } = {}) {
   return value;
 }
 export function integer(value, label, min = 0, max = 100000000) {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < min || value > max) fail(400, `${label}: informe um inteiro entre ${min} e ${max}.`);
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < min || value > max)
+    fail(400, `${label}: informe um inteiro entre ${min} e ${max}.`);
   return value;
 }
 export function choice(value, options, label) {
@@ -28,11 +29,17 @@ export function identifier(value) {
   const id = typeof value === 'string' && /^[1-9]\d*$/.test(value) ? Number(value) : value;
   return integer(id, 'Identificador', 1);
 }
-export const optionalId = (value) => value === null || value === '' || value === undefined ? null : identifier(value);
+export const optionalId = (value) =>
+  value === null || value === '' || value === undefined ? null : identifier(value);
 export function date(value) {
-  if (typeof value !== 'string' || !value || !Number.isFinite(new Date(value).getTime())) fail(400, 'Data inválida.');
+  if (typeof value !== 'string' || !value || !Number.isFinite(new Date(value).getTime()))
+    fail(400, 'Data inválida.');
   return new Date(value).toISOString();
 }
-export async function reference(one, table, id, label) {
-  if (id !== null && !await one(`SELECT id FROM ${table} WHERE id = ? AND archived = 0`, [id])) fail(400, `${label} não encontrado ou arquivado.`);
+export async function reference(one, table, id, label, companyId) {
+  if (
+    id !== null &&
+    !(await one(`SELECT id FROM ${table} WHERE id = ? AND company_id = ? AND archived = 0`, [id, companyId]))
+  )
+    fail(400, `${label} não encontrado ou arquivado.`);
 }

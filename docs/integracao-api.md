@@ -7,14 +7,14 @@ Usamos o prefixo `/api`, JSON e autenticação Bearer nas rotas privadas. Centra
 | Método e caminho | Operação e dados |
 | --- | --- |
 | GET /health | Saúde HTTP; resposta `{ status: "ok", service: "plataforma-gestao-integrada-api" }` |
-| GET /setup | Consulta de `needsSetup` e `storage` |
-| POST /setup | Primeiro administrador: `{ name, email, password }` |
+| GET /status | Banco em uso: `{ storage }` |
+| POST /auth/register | Novo negócio e administrador: `{ name, company, email, password }` |
 | POST /auth/login | Entrada: `{ email, password }`; resposta `{ token, user }` |
 | GET /auth/me | Dados da conta autenticada |
 | POST /auth/logout | Encerramento da sessão |
 | PUT /auth/password | Troca de senha: `{ current_password, password }` |
 
-Criamos somente um administrador inicial. Usamos senhas de 10 a 128 caracteres e sessões de oito horas. Enviamos o token em `Authorization: Bearer TOKEN`. Invalidamos as sessões ao trocar a senha.
+Cada cadastro cria um negócio e seu administrador; os demais usuários são criados pelo administrador e pertencem ao mesmo negócio. Usamos senhas de 10 a 128 caracteres e sessões de oito horas. Enviamos o token em `Authorization: Bearer TOKEN`. Invalidamos as sessões ao trocar a senha.
 
 ## Cadastros
 

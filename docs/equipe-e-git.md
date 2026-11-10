@@ -1,6 +1,6 @@
 # Trabalho em equipe
 
-Dividimos o projeto nas frentes abaixo. Ainda precisamos confirmar o responsável por documentação e os revisores.
+Dividimos o projeto entre os cinco integrantes abaixo. Toda a equipe cuida da documentação.
 
 | Integrante | Responsabilidade | Área |
 | --- | --- | --- |
@@ -9,7 +9,7 @@ Dividimos o projeto nas frentes abaixo. Ainda precisamos confirmar o responsáve
 | Raphael Nunes | Backend | `backend/src/` |
 | Vinicius Bueno | Banco de dados | `database/` |
 | Joao Silva | Escopo e funcionalidades | `docs/escopo.md` e issues |
-| A informar | Documentação | `docs/` e README |
+| Toda a equipe | Documentação | `docs/` e README |
 
 ## Fluxo de contribuição
 

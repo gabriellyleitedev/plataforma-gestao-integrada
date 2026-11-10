@@ -7,8 +7,18 @@ export default [
   { ignores: ['**/dist/**', '**/node_modules/**', '.local/**', 'test-results/**', 'playwright-report/**'] },
   js.configs.recommended,
   { rules: { 'no-unused-vars': ['error', { argsIgnorePattern: '^_' }] } },
-  { files: ['**/*.{js,jsx}'], languageOptions: { ecmaVersion: 'latest', sourceType: 'module', parserOptions: { ecmaFeatures: { jsx: true } } } },
-  { files: ['backend/**/*.js', 'e2e/**/*.js', '*.js', 'frontend/api/**/*.js', 'frontend/vite.config.js'], languageOptions: { globals: globals.node } },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parserOptions: { ecmaFeatures: { jsx: true } }
+    }
+  },
+  {
+    files: ['backend/**/*.js', 'e2e/**/*.js', '*.js', 'frontend/vite.config.js', 'frontend/api/**/*.js'],
+    languageOptions: { globals: globals.node }
+  },
   { files: ['e2e/**/*.js'], languageOptions: { globals: globals.browser } },
   {
     files: ['frontend/src/**/*.{js,jsx}'],

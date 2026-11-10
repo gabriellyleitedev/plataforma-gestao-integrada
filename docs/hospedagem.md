@@ -1,6 +1,12 @@
 # Hospedagem
 
-Planejamos usar planos gratuitos e conferir os limites antes da publicação. Ainda não provisionamos serviços em nuvem.
+Publicamos a aplicação somente em planos gratuitos, sem cartão cadastrado.
+
+| Parte | Provedor | Endereço |
+| --- | --- | --- |
+| Interface | Vercel | https://plataforma-gestao-integrada.vercel.app |
+| API | Render Free, região Virginia | https://plataforma-gestao-api-hywk.onrender.com |
+| Banco | TiDB Cloud Starter, AWS `us-east-1` | Acesso restrito à API |
 
 Para a configuração mais curta, seguimos o [guia Vercel](vercel.md): publicamos interface e API no mesmo projeto e conectamos MySQL pelas variáveis privadas. A configuração Render abaixo permanece como alternativa.
 
@@ -35,11 +41,19 @@ Usamos o `PORT` fornecido pela plataforma. Configuramos as credenciais `DB_*` so
 
 Consideramos a suspensão por inatividade e as cotas do [plano gratuito do Render](https://render.com/docs/free). Para MySQL, usamos um provedor separado.
 
-## MySQL no Aiven Free
+## MySQL no TiDB Cloud Starter
 
-Consideramos o [plano gratuito do Aiven](https://aiven.io/docs/products/mysql/concepts/mysql-free-tier). Antes de criar o serviço, conferimos disponibilidade e limites na conta.
+Usamos o [TiDB Cloud Starter](https://docs.pingcap.com/tidbcloud/serverless-limitations/), compatível com MySQL e gratuito sem prazo de expiração. Criamos a instância na AWS `us-east-1`, próxima da API, e mantemos o limite de gastos em US$ 0. Validamos os 14 fluxos de `npm run test:mysql` nessa instância.
 
-Configuramos host, porta, banco, usuário e senha no backend. Ativamos `DB_SSL=true` e mantemos a validação TLS. Se precisarmos da CA do provedor, colamos o PEM em `DB_SSL_CA` ou indicamos um arquivo em `DB_SSL_CA_PATH`. Não colocamos credenciais em `VITE_*`.
+| Variável | Valor |
+| --- | --- |
+| `DB_HOST` | Host público exibido em Connect |
+| `DB_PORT` | `4000` |
+| `DB_NAME` | `plataforma_gestao_integrada` |
+| `DB_USER` | Usuário exibido em Connect, com o prefixo da instância |
+| `DB_SSL` | `true`, sem CA adicional |
+
+Mantemos a validação TLS. O certificado do TiDB Cloud é emitido por uma autoridade pública, então não preenchemos `DB_SSL_CA`. Não colocamos credenciais em `VITE_*`.
 
 Em banco já provisionado, inicializamos as tabelas do schema com o usuário autorizado. Para transferir uma instalação local, planejamos o backup e a migração separadamente.
 
@@ -50,6 +64,6 @@ Em banco já provisionado, inicializamos as tabelas do schema com o usuário aut
 3. Conferimos HTTPS, CORS, conexão com o banco e acesso direto às rotas.
 4. Revisamos cotas e evitamos habilitar planos pagos ou upgrades automáticos.
 
-Se encontrarmos HTTP 404 em `/api/setup` na Vercel, conferimos se publicamos a API e configuramos `VITE_API_URL` com sua URL HTTPS terminando em `/api`. Depois de alterar a variável, fazemos um novo deploy para incorporar o valor no frontend.
+Se encontrarmos HTTP 404 em `/api/status` na Vercel, conferimos se publicamos a API e configuramos `VITE_API_URL` com sua URL HTTPS terminando em `/api`. Depois de alterar a variável, fazemos um novo deploy para incorporar o valor no frontend.
 
 Se não conseguirmos um plano gratuito compatível, mantemos a apresentação local até definirmos outra opção.

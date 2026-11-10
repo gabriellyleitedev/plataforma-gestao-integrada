@@ -7,7 +7,11 @@ export function getPool() {
   if (!pool) {
     const options = databaseOptions();
     const ssl = process.env.DB_SSL === 'true';
-    const ca = process.env.DB_SSL_CA ? process.env.DB_SSL_CA.replaceAll('\\n', '\n') : process.env.DB_SSL_CA_PATH ? readFileSync(process.env.DB_SSL_CA_PATH, 'utf8') : undefined;
+    const ca = process.env.DB_SSL_CA
+      ? process.env.DB_SSL_CA.replaceAll('\\n', '\n')
+      : process.env.DB_SSL_CA_PATH
+        ? readFileSync(process.env.DB_SSL_CA_PATH, 'utf8')
+        : undefined;
     pool = mysql.createPool({
       ...options,
       waitForConnections: true,
@@ -22,5 +26,8 @@ export function getPool() {
 }
 
 export async function closePool() {
-  if (pool) { await pool.end(); pool = undefined; }
+  if (pool) {
+    await pool.end();
+    pool = undefined;
+  }
 }

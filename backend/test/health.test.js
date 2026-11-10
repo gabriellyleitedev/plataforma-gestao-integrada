@@ -23,7 +23,11 @@ test('rota desconhecida retorna JSON 404', async () => {
   assert.equal((await response.json()).error.code, 'NOT_FOUND');
 });
 test('JSON malformado retorna erro 400', async () => {
-  const response = await fetch(`${base}/api/health`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{' });
+  const response = await fetch(`${base}/api/health`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{'
+  });
   assert.equal(response.status, 400);
   assert.equal((await response.json()).error.code, 'INVALID_JSON');
 });
